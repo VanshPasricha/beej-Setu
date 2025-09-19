@@ -40,7 +40,7 @@ export default function ProfileSetupPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [profile, setProfile] = useState({
-    farmName: "",
+    farmerName: "",
     farmSize: "",
     location: "",
     phoneNumber: "",
@@ -91,7 +91,7 @@ export default function ProfileSetupPage() {
   const isStepValid = () => {
     switch (currentStep) {
       case 1:
-        return profile.farmName && profile.farmSize && profile.location
+        return profile.farmerName && profile.farmSize && profile.location
       case 2:
         return profile.cropsGrown.length > 0
       case 3:
@@ -134,14 +134,14 @@ export default function ProfileSetupPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="farm-name" className="text-sm font-medium text-gray-700">
-                  {t("farmName")}
+                  {t("farmerName")}
                 </Label>
                 <Input
                   id="farm-name"
                   placeholder="e.g., Green Valley Farm"
                   className="border-gray-200 focus:border-orange-300 focus:ring-orange-200"
-                  value={profile.farmName}
-                  onChange={(e) => setProfile({ ...profile, farmName: e.target.value })}
+                  value={profile.farmerName}
+                  onChange={(e) => setProfile({ ...profile, farmerName: e.target.value })}
                 />
               </div>
 
