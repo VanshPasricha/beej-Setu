@@ -88,18 +88,22 @@ export default function ProfileSetupPage() {
     }, 2000)
   }
 
-  const isStepValid = () => {
-    switch (currentStep) {
-      case 1:
-        return profile.farmName && profile.farmSize && profile.location
-      case 2:
-        return profile.cropsGrown.length > 0
-      case 3:
-        return profile.soilType // Updated validation for soil type
-      default:
-        return false
-    }
+const isStepValid = () => {
+  switch (currentStep) {
+    case 1:
+      return (
+        profile.farmName.trim().length > 0 &&
+        profile.farmSize.trim().length > 0 &&
+        profile.location.trim().length > 0
+      )
+    case 2:
+      return profile.cropsGrown.length > 0
+    case 3:
+      return profile.soilType !== ""
+    default:
+      return false
   }
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-orange-100 flex items-center justify-center p-4">
