@@ -121,15 +121,12 @@ export function Chatbot() {
   const getBotResponse = useCallback(
     async (userMessage: string): Promise<string> => {
       try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const response = await fetch("/api/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization:
-              "Bearer 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",
           },
           body: JSON.stringify({
-            model: "openai/gpt-3.5-turbo",
             messages: [
               { role: "system", content: "You are a helpful assistant." },
               { role: "user", content: userMessage },
@@ -138,13 +135,13 @@ export function Chatbot() {
         })
 
         if (!response.ok) {
-          throw new Error(`OpenRouter API error: ${response.statusText}`)
+          throw new Error(`Chat API error: ${response.statusText}`)
         }
 
         const data = await response.json()
-        return data.choices[0].message.content
+        return data.choices?.[0]?.message?.content ?? "Sorry, I couldn't generate a response."
       } catch (error) {
-        console.error("Error fetching from OpenRouter:", error)
+        console.error("Error fetching from Chat API:", error)
         return "Sorry, I am having trouble responding right now."
       }
     },

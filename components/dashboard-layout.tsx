@@ -42,6 +42,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { t } = useTranslation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [chatbotOpen, setChatbotOpen] = useState(false)
+  const [userName, setUserName] = useState<string>('Farmer')
 
   // Smooth reveal on mount
   useEffect(() => {
@@ -49,6 +50,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => el.classList.add("visible"))
     }, 50)
     return () => clearTimeout(timer)
+  }, [])
+
+  // Load user name from storage
+  useEffect(() => {
+    try {
+      const name = localStorage.getItem('beejsetu-userName')
+      if (name) setUserName(name)
+    } catch {}
   }, [])
 
   return (
@@ -136,7 +145,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <User className="w-5 h-5 text-gray-600" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">Rajesh Kumar</p>
+                <p className="text-sm font-medium text-gray-900">{userName}</p>
                 <p className="text-xs text-gray-500">Eco Apprentice</p>
               </div>
             </div>

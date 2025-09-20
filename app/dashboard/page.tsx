@@ -32,11 +32,11 @@ import { useLanguage } from "@/contexts/language-context"
 import { DashboardLayout } from "@/components/dashboard-layout"
 import { TranslationWrapper } from "@/components/translation-wrapper"
 
-// Mock data - in real app this would come from API
-const mockUserData = {
-  name: "Rajesh Kumar",
-  farmName: "Green Valley Farm",
-  location: "Pune, Maharashtra",
+// Default values (will be replaced by API data if available)
+const defaultUserData = {
+  name: "Farmer",
+  farmName: "Your Farm",
+  location: "",
   level: "Eco Apprentice",
   currentPoints: 750,
   pointsToNextLevel: 1000,
@@ -51,16 +51,11 @@ const mockUserData = {
     { id: "eco-expert", name: "Eco Expert", icon: Award, earned: false },
   ],
   impactMetrics: {
-    waterSaved: 2450, // gallons
-    co2Reduced: 180, // lbs
-    soilImproved: 3.2, // acres
-    pollinatorsSupported: 8, // species
+    waterSaved: 2450,
+    co2Reduced: 180,
+    soilImproved: 3.2,
+    pollinatorsSupported: 8,
   },
-  recentActivities: [
-    { id: 1, type: "challenge", title: "Completed Water Conservation Challenge", points: 150, date: "2 days ago" },
-    { id: 2, type: "achievement", title: "Earned Water Warrior Badge", points: 100, date: "1 week ago" },
-    { id: 3, type: "level", title: "Advanced to Eco Apprentice", points: 0, date: "2 weeks ago" },
-  ],
 }
 
 const mockWeatherData = {
@@ -131,6 +126,35 @@ export default function DashboardPage() {
   // const [selectedMetric, setSelectedMetric] = useState("water")
   const { lang } = useLanguage()
   const [loading, setLoading] = useState(true)
+  const [userData, setUserData] = useState<typeof defaultUserData>(defaultUserData)
+  
+  // Load user from API if we have an id
+  useEffect(() => {
+    const id = typeof window !== 'undefined' ? localStorage.getItem('beejsetu-userId') : null
+    const storedName = typeof window !== 'undefined' ? localStorage.getItem('beejsetu-userName') : null
+    if (storedName) {
+      setUserData((u) => ({ ...u, name: storedName }))
+    }
+    if (!id) {
+      const t = setTimeout(() => setLoading(false), 300)
+      return () => clearTimeout(t)
+    }
+    ;(async () => {
+      try {
+        const res = await fetch(`/api/users/${id}`)
+        if (res.ok) {
+          const data = await res.json()
+          const name = data?.user?.name || storedName || defaultUserData.name
+          const location = data?.profile?.location || ''
+          setUserData((u) => ({ ...u, name, location }))
+        }
+      } catch (e) {
+        console.warn('Failed to fetch user:', e)
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [])
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 300)
     return () => clearTimeout(t)
@@ -297,14 +321,14 @@ export default function DashboardPage() {
           <div className="bg-gradient-to-r from-orange-500 to-green-600 rounded-lg p-6 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold mb-1">{tt("welcomeBack")}, {mockUserData.name}!</h1>
+                <h1 className="text-2xl font-bold mb-1">{tt("welcomeBack")}, {userData.name}!</h1>
                 <p className="text-orange-100 flex items-center">
                   <MapPin className="w-4 h-4 mr-1" />
-                  {mockUserData.farmName} • {mockUserData.location}
+                  {userData.farmName}{userData.location ? ` • ${userData.location}` : ""}
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold">{mockUserData.currentPoints}</div>
+                <div className="text-3xl font-bold">{userData.currentPoints}</div>
                 <div className="text-sm text-orange-100">{tt("totalPoints")}</div>
               </div>
             </div>
@@ -336,16 +360,16 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">{tt("currentLevel")}</p>
-                      <p className="text-xl font-bold text-gray-900">{mockUserData.level}</p>
+                      <p className="text-xl font-bold text-gray-900">{userData.level}</p>
                     </div>
                     <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                       <Trophy className="w-6 h-6 text-orange-600" />
                     </div>
                   </div>
                   <div className="mt-3">
-                    <Progress value={(mockUserData.currentPoints / mockUserData.pointsToNextLevel) * 100} className="h-2" />
+                    <Progress value={(userData.currentPoints / userData.pointsToNextLevel) * 100} className="h-2" />
                     <p className="text-xs text-gray-500 mt-1">
-                      {mockUserData.pointsToNextLevel - mockUserData.currentPoints} {tt("pointsToNextLevel")}
+                      {userData.pointsToNextLevel - userData.currentPoints} {tt("pointsToNextLevel")}
                     </p>
                   </div>
                 </CardContent>
@@ -356,13 +380,13 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">{tt("ranking")}</p>
-                      <p className="text-xl font-bold text-gray-900">#{mockUserData.ranking}</p>
+                      <p className="text-xl font-bold text-gray-900">#{userData.ranking}</p>
                     </div>
                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                       <Users className="w-6 h-6 text-green-600" />
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-3">{outOfFarmersText(mockUserData.totalUsers.toLocaleString())}</p>
+                  <p className="text-xs text-gray-500 mt-3">{outOfFarmersText(userData.totalUsers.toLocaleString())}</p>
                 </CardContent>
               </Card>
 
@@ -371,13 +395,13 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600">{tt("activeChallenges")}</p>
-                      <p className="text-xl font-bold text-gray-900">{mockUserData.activeChallenges}</p>
+                      <p className="text-xl font-bold text-gray-900">{userData.activeChallenges}</p>
                     </div>
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                       <Target className="w-6 h-6 text-blue-600" />
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-3">{mockUserData.completedChallenges} {tt("completedThisMonth")}</p>
+                  <p className="text-xs text-gray-500 mt-3">{userData.completedChallenges} {tt("completedThisMonth")}</p>
                 </CardContent>
               </Card>
 
@@ -601,7 +625,7 @@ export default function DashboardPage() {
                     <Droplets className="w-8 h-8 text-blue-600" />
                   </div>
                   <div className="text-2xl font-bold text-gray-900">
-                    {mockUserData.impactMetrics.waterSaved.toLocaleString()}
+                    {userData.impactMetrics.waterSaved.toLocaleString()}
                   </div>
                   <div className="text-sm text-gray-600">{tt("gallonsSaved")}</div>
                 </div>
@@ -609,14 +633,14 @@ export default function DashboardPage() {
                   <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
                     <Leaf className="w-8 h-8 text-green-600" />
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">{mockUserData.impactMetrics.co2Reduced}</div>
+                  <div className="text-2xl font-bold text-gray-900">{userData.impactMetrics.co2Reduced}</div>
                   <div className="text-sm text-gray-600">{tt("co2Reduced")}</div>
                 </div>
                 <div className="text-center">
                   <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
                     <Target className="w-8 h-8 text-yellow-600" />
                   </div>
-                  <div className="text-2xl font-bold text-gray-900">{mockUserData.impactMetrics.soilImproved}</div>
+                  <div className="text-2xl font-bold text-gray-900">{userData.impactMetrics.soilImproved}</div>
                   <div className="text-sm text-gray-600">{tt("acresSoilImproved")}</div>
                 </div>
                 <div className="text-center">
@@ -624,7 +648,7 @@ export default function DashboardPage() {
                     <Award className="w-8 h-8 text-purple-600" />
                   </div>
                   <div className="text-2xl font-bold text-gray-900">
-                    {mockUserData.impactMetrics.pollinatorsSupported}
+                    {userData.impactMetrics.pollinatorsSupported}
                   </div>
                   <div className="text-sm text-gray-600">{tt("pollinatorSpecies")}</div>
                 </div>

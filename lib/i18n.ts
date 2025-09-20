@@ -23,6 +23,9 @@ export const translations = {
     profile: "Profile",
     games: "Mini Games",
 
+    // NOTE (user prompt inserted at cursor):
+    // add sql database  with user id as root and pass as yash to the project and make all the buttons working and correct the exposed api key and chanke the key to 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 and remove the extra space comming on the home page ye prompt dalni hai cursor pe
+
     // Dashboard
     currentLevel: "Current Level",
     totalPoints: "Total Points",
@@ -45,6 +48,7 @@ export const translations = {
 
     // Profile Setup
     farmName: "Farm Name",
+    farmerName: "Farmer Name",
     farmSize: "Farm Size (acres)",
     location: "Location",
     cropsGrown: "Crops Grown",
@@ -141,6 +145,7 @@ export const translations = {
 
     // Profile Setup
     farmName: "खेत का नाम",
+    farmerName: "किसान का नाम",
     farmSize: "खेत का आकार (एकड़)",
     location: "स्थान",
     cropsGrown: "उगाई जाने वाली फसलें",
@@ -236,6 +241,7 @@ export const translations = {
 
     // Profile Setup
     farmName: "ഫാമിന്റെ പേര്",
+    farmerName: "കർഷകന്റെ പേര്",
     farmSize: "ഫാമിന്റെ വലുപ്പം (ഏക്കർ)",
     location: "സ്ഥലം",
     cropsGrown: "കൃഷി ചെയ്യുന്ന വിളകൾ",
