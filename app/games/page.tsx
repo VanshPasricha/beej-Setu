@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Play, Trophy, Star, Clock, Award, TrendingUp, Users, Home, RefreshCcw, Puzzle, Calculator } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 import { DashboardLayout } from "@/components/dashboard-layout"
 
 const miniGames = [
@@ -55,15 +56,14 @@ export default function GamesPage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null)
   const [gameState, setGameState] = useState<"menu" | "playing" | "completed">("menu")
   const [session, setSession] = useState(0)
-
-  // Multilingual support (basic)
-  const [lang, setLang] = useState<"en" | "hi" | "ml">("en")
+  const [loading, setLoading] = useState(true)
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("beejsetu-language") as "en" | "hi" | "ml" | null
-      if (saved) setLang(saved)
-    } catch {}
+    const t = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(t)
   }, [])
+
+  // Multilingual support via global context
+  const { lang } = useLanguage()
 
   const translations: Record<string, Record<string, string>> = {
     en: {
@@ -189,7 +189,7 @@ export default function GamesPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 stagger">
           <Card className="border-0 shadow-md">
             <CardContent className="p-4 text-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -229,67 +229,89 @@ export default function GamesPage() {
         </div>
 
         {/* Mini-Games Grid */}
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">{t("available_games")}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {miniGames
+        <div className="border-t border-gray-100 pt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{t("available_games")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 stagger">
+            {(loading ? Array.from({ length: 2 }).map((_, i) => ({ id: `s${i}` })) : miniGames
               .filter((g) => g.id === "match-pairs" || g.id === "sum-puzzle")
-              .map((game) => {
+            ).map((game: any) => {
               const IconComponent = game.icon
               return (
                 <Card
                   key={game.id}
-                  className={`border-2 shadow-md hover:shadow-lg transition-all cursor-pointer ${game.borderColor} ${
-                    game.completed ? "bg-gradient-to-br from-white to-green-50" : ""
+                  className={`border-2 shadow-md hover:shadow-lg transition-all cursor-pointer rounded-lg ${game?.borderColor ?? "border-gray-100"} ${
+                    game?.completed ? "bg-gradient-to-br from-white to-green-50" : ""
                   }`}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
-                      <div className={`w-16 h-16 rounded-full flex items-center justify-center ${game.bgColor}`}>
-                        <IconComponent className={`w-8 h-8 ${game.color}`} />
-                      </div>
-                      <div className="flex flex-col items-end space-y-1">
-                        <Badge className={getDifficultyColor(game.difficulty)}>{game.difficulty}</Badge>
-                        {game.completed && <Badge className="bg-green-100 text-green-800">Completed</Badge>}
-                      </div>
+                      {loading ? (
+                        <div className="w-full flex items-center justify-between">
+                          <div className="skeleton w-16 h-16 rounded-full" />
+                          <div className="skeleton h-5 w-16" />
+                        </div>
+                      ) : (
+                        <>
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${game.bgColor}`}>
+                            <IconComponent className={`w-8 h-8 ${game.color}`} />
+                          </div>
+                          <div className="flex flex-col items-end space-y-1">
+                            <Badge className={getDifficultyColor(game.difficulty)}>{game.difficulty}</Badge>
+                            {game.completed && <Badge className="bg-green-100 text-green-800">Completed</Badge>}
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <CardTitle className="text-xl">{game.title}</CardTitle>
+                    <CardTitle className="text-xl">{loading ? <span className="skeleton h-5 w-48 inline-block" /> : game.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-sm text-gray-600">{game.description}</p>
+                    {loading ? (
+                      <div className="space-y-2">
+                        <div className="skeleton h-3 w-5/6" />
+                        <div className="skeleton h-3 w-2/3" />
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-600">{game.description}</p>
+                    )}
 
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm text-gray-800">Learning Objective:</h4>
-                      <p className="text-xs text-gray-600">{game.objective}</p>
+                      {loading ? <div className="skeleton h-3 w-1/2" /> : <p className="text-xs text-gray-600">{game.objective}</p>}
                     </div>
 
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm text-gray-800">Skills Developed:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {game.skills.map((skill, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
+                      {loading ? (
+                        <div className="flex flex-wrap gap-1">
+                          {[0,1,2].map((i)=>(<div key={i} className="skeleton h-5 w-20 rounded" />))}
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {game.skills.map((skill: string, index: number) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center space-x-2">
                         <Clock className="w-4 h-4 text-gray-500" />
-                        <span>{game.duration}</span>
+                        <span>{loading ? <span className="skeleton h-3 w-16 inline-block" /> : game.duration}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Trophy className="w-4 h-4 text-orange-500" />
-                        <span>{game.points} points</span>
+                        <span>{loading ? <span className="skeleton h-3 w-16 inline-block" /> : `${game.points} points`}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Users className="w-4 h-4 text-blue-500" />
-                        <span>{game.players.toLocaleString()} played</span>
+                        <span>{loading ? <span className="skeleton h-3 w-20 inline-block" /> : `${game.players.toLocaleString()} played`}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Star className="w-4 h-4 text-yellow-500" />
-                        <span>{game.rating}/5</span>
+                        <span>{loading ? <span className="skeleton h-3 w-10 inline-block" /> : `${game.rating}/5`}</span>
                       </div>
                     </div>
 
@@ -302,13 +324,17 @@ export default function GamesPage() {
                       </div>
                     )}
 
-                    <Button
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-                      onClick={() => startGame(game.id)}
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      {game.completed ? t("play_again") : t("start_game")}
-                    </Button>
+                    {loading ? (
+                      <div className="skeleton h-10 w-full" />
+                    ) : (
+                      <Button
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white button-press"
+                        onClick={() => startGame(game.id)}
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        {game.completed ? t("play_again") : t("start_game")}
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               )
@@ -317,31 +343,41 @@ export default function GamesPage() {
         </div>
 
         {/* Achievements */}
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">{t("achievements")}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {achievements.map((achievement) => {
+        <div className="border-t border-gray-100 pt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{t("achievements")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+            {(loading ? Array.from({ length: 4 }).map((_, i) => ({ id: `s${i}`, earned: i % 2 === 0 })) : achievements).map((achievement: any) => {
               const IconComponent = achievement.icon
               return (
                 <Card
                   key={achievement.id}
-                  className={`border-0 shadow-md ${
+                  className={`border-0 shadow-md rounded-lg ${
                     achievement.earned ? "bg-gradient-to-br from-white to-orange-50 border-orange-200" : "opacity-60"
                   }`}
                 >
                   <CardContent className="p-4 text-center">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 ${
-                        achievement.earned ? "bg-orange-100" : "bg-gray-100"
-                      }`}
-                    >
-                      <IconComponent
-                        className={`w-6 h-6 ${achievement.earned ? "text-orange-600" : "text-gray-400"}`}
-                      />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 text-sm">{achievement.name}</h3>
-                    <p className="text-xs text-gray-600 mt-1">{achievement.description}</p>
-                    {achievement.earned && <Badge className="bg-orange-100 text-orange-800 mt-2 text-xs">Earned</Badge>}
+                    {loading ? (
+                      <>
+                        <div className="skeleton w-12 h-12 rounded-full mx-auto mb-3" />
+                        <div className="skeleton h-4 w-24 mx-auto mb-2" />
+                        <div className="skeleton h-3 w-32 mx-auto" />
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 ${
+                            achievement.earned ? "bg-orange-100" : "bg-gray-100"
+                          }`}
+                        >
+                          <IconComponent
+                            className={`w-6 h-6 ${achievement.earned ? "text-orange-600" : "text-gray-400"}`}
+                          />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm">{achievement.name}</h3>
+                        <p className="text-xs text-gray-600 mt-1">{achievement.description}</p>
+                        {achievement.earned && <Badge className="bg-orange-100 text-orange-800 mt-2 text-xs">Earned</Badge>}
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               )
@@ -436,7 +472,7 @@ function MatchPairsGame() {
   return (
     <div className="space-y-6">
       <Card className="border-0 shadow-md">
-        <CardContent className="p-4 flex items-center justify_between">
+        <CardContent className="p-4 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold">{t("title")}</h2>
             <p className="text-gray-600 text-sm">{t("howto")}</p>
@@ -478,13 +514,7 @@ function MatchPairsGame() {
 
 // New Game: Sustainability Sum Puzzle
 function SumPuzzleGame() {
-  const [lang, setLang] = useState<"en" | "hi" | "ml">("en")
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("beejsetu-language") as "en" | "hi" | "ml" | null
-      if (saved) setLang(saved)
-    } catch {}
-  }, [])
+  const { lang } = useLanguage()
 
   const tr = {
     en: {
