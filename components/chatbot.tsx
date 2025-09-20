@@ -126,7 +126,7 @@ export function Chatbot() {
           headers: {
             "Content-Type": "application/json",
             Authorization:
-              "Bearer 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",
+              "Bearer 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",
           },
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
