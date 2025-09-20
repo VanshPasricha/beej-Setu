@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -40,7 +39,7 @@ export default function ProfileSetupPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
   const [profile, setProfile] = useState({
-    farmerNamegit : "",
+    farmerName: "",
     farmSize: "",
     location: "",
     phoneNumber: "",
@@ -79,7 +78,6 @@ export default function ProfileSetupPage() {
 
   const handleSubmit = async () => {
     setIsLoading(true)
-
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false)
@@ -91,7 +89,7 @@ export default function ProfileSetupPage() {
   const isStepValid = () => {
     switch (currentStep) {
       case 1:
-        return profile.farmerNamegit  && profile.farmSize && profile.location
+        return profile.farmerName && profile.farmSize && profile.location
       case 2:
         return profile.cropsGrown.length > 0
       case 3:
@@ -110,7 +108,6 @@ export default function ProfileSetupPage() {
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">Complete Your Profile</CardTitle>
           <p className="text-sm text-gray-600">Help us personalize your farming journey</p>
-
           {/* Progress indicator */}
           <div className="flex justify-center mt-6">
             <div className="flex space-x-2">
@@ -125,26 +122,23 @@ export default function ProfileSetupPage() {
             </div>
           </div>
         </CardHeader>
-
         <CardContent className="space-y-6">
           {/* Step 1: Basic Farm Information */}
           {currentStep === 1 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Farm Information</h3>
-
               <div className="space-y-2">
                 <Label htmlFor="farm-name" className="text-sm font-medium text-gray-700">
-                  {t("farmerNamegit ")}
+                  {t("farmerName")}
                 </Label>
                 <Input
                   id="farm-name"
                   placeholder="e.g., Green Valley Farm"
                   className="border-gray-200 focus:border-orange-300 focus:ring-orange-200"
-                  value={profile.farmerNamegit }
-                  onChange={(e) => setProfile({ ...profile, farmerNamegit : e.target.value })}
+                  value={profile.farmerName}
+                  onChange={(e) => setProfile({ ...profile, farmerName: e.target.value })}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="farm-size" className="text-sm font-medium text-gray-700">
                   {t("farmSize")}
@@ -158,7 +152,6 @@ export default function ProfileSetupPage() {
                   onChange={(e) => setProfile({ ...profile, farmSize: e.target.value })}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="location" className="text-sm font-medium text-gray-700">
                   {t("location")}
@@ -174,7 +167,6 @@ export default function ProfileSetupPage() {
                   />
                 </div>
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
                   {t("phoneNumber")}
@@ -193,13 +185,11 @@ export default function ProfileSetupPage() {
               </div>
             </div>
           )}
-
           {/* Step 2: Crops Selection */}
           {currentStep === 2 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">{t("cropsGrown")}</h3>
               <p className="text-sm text-gray-600 mb-4">Select all crops you currently grow or plan to grow</p>
-
               <div className="grid grid-cols-2 gap-3">
                 {cropOptions.map((crop) => (
                   <div
@@ -222,14 +212,12 @@ export default function ProfileSetupPage() {
               </div>
             </div>
           )}
-
           {/* Step 3: Soil Type & Bio */}
           {currentStep === 3 && (
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Soil Type</h3>
                 <p className="text-sm text-gray-600 mb-4">What type of soil do you primarily work with?</p>
-
                 <div className="grid grid-cols-1 gap-3">
                   {soilTypes.map((soil) => (
                     <div
@@ -259,7 +247,6 @@ export default function ProfileSetupPage() {
                   ))}
                 </div>
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="bio" className="text-sm font-medium text-gray-700">
                   {t("bio")}
@@ -274,7 +261,6 @@ export default function ProfileSetupPage() {
               </div>
             </div>
           )}
-
           {/* Navigation Buttons */}
           <div className="flex justify-between pt-6">
             <Button
@@ -285,7 +271,6 @@ export default function ProfileSetupPage() {
             >
               Back
             </Button>
-
             {currentStep < 3 ? (
               <Button
                 onClick={handleNext}
@@ -310,3 +295,4 @@ export default function ProfileSetupPage() {
     </div>
   )
 }
+

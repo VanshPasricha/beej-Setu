@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8,7 +7,26 @@ import { Play, Trophy, Star, Clock, Award, TrendingUp, Users, Home, RefreshCcw, 
 import { useLanguage } from "@/contexts/language-context"
 import { DashboardLayout } from "@/components/dashboard-layout"
 
-const miniGames = [
+type Game = {
+  id: string
+  title: string
+  description: string
+  icon: React.ElementType
+  color: string
+  bgColor: string
+  borderColor: string
+  difficulty: string
+  duration: string
+  points: number
+  players: number
+  rating: number
+  completed: boolean
+  bestScore: number
+  objective: string
+  skills: string[]
+}
+
+const miniGames: Game[] = [
   {
     id: "match-pairs",
     title: "Match the Following",
@@ -57,6 +75,7 @@ export default function GamesPage() {
   const [gameState, setGameState] = useState<"menu" | "playing" | "completed">("menu")
   const [session, setSession] = useState(0)
   const [loading, setLoading] = useState(true)
+
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 300)
     return () => clearTimeout(t)
@@ -64,7 +83,6 @@ export default function GamesPage() {
 
   // Multilingual support via global context
   const { lang } = useLanguage()
-
   const translations: Record<string, Record<string, string>> = {
     en: {
       games_title: "Learning Mini-Games",
@@ -131,7 +149,6 @@ export default function GamesPage() {
   if (gameState === "playing" && selectedGame) {
     const game = miniGames.find((g) => g.id === selectedGame)
     if (!game) return null
-
     return (
       <DashboardLayout>
         <div className="space-y-6">
@@ -164,7 +181,6 @@ export default function GamesPage() {
               </div>
             </div>
           </div>
-
           {/* Game Component (only new games are playable) */}
           {selectedGame === "match-pairs" && <MatchPairsGame key={session} />}
           {selectedGame === "sum-puzzle" && <SumPuzzleGame key={session} />}
@@ -187,7 +203,6 @@ export default function GamesPage() {
             <div className="text-sm text-gray-500">Total Points Earned</div>
           </div>
         </div>
-
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 stagger">
           <Card className="border-0 shadow-md">
@@ -227,7 +242,6 @@ export default function GamesPage() {
             </CardContent>
           </Card>
         </div>
-
         {/* Mini-Games Grid */}
         <div className="border-t border-gray-100 pt-6">
           <h2 className="text-xl font-bold text-gray-900 mb-3">{t("available_games")}</h2>
@@ -273,17 +287,15 @@ export default function GamesPage() {
                     ) : (
                       <p className="text-sm text-gray-600">{game.description}</p>
                     )}
-
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm text-gray-800">Learning Objective:</h4>
                       {loading ? <div className="skeleton h-3 w-1/2" /> : <p className="text-xs text-gray-600">{game.objective}</p>}
                     </div>
-
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm text-gray-800">Skills Developed:</h4>
                       {loading ? (
                         <div className="flex flex-wrap gap-1">
-                          {[0,1,2].map((i)=>(<div key={i} className="skeleton h-5 w-20 rounded" />))}
+                          {[0, 1, 2].map((i) => (<div key={i} className="skeleton h-5 w-20 rounded" />))}
                         </div>
                       ) : (
                         <div className="flex flex-wrap gap-1">
@@ -295,7 +307,6 @@ export default function GamesPage() {
                         </div>
                       )}
                     </div>
-
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center space-x-2">
                         <Clock className="w-4 h-4 text-gray-500" />
@@ -314,7 +325,6 @@ export default function GamesPage() {
                         <span>{loading ? <span className="skeleton h-3 w-10 inline-block" /> : `${game.rating}/5`}</span>
                       </div>
                     </div>
-
                     {game.completed && game.bestScore > 0 && (
                       <div className="bg-green-50 p-3 rounded-lg">
                         <div className="flex items-center justify-between text-sm">
@@ -323,7 +333,6 @@ export default function GamesPage() {
                         </div>
                       </div>
                     )}
-
                     {loading ? (
                       <div className="skeleton h-10 w-full" />
                     ) : (
@@ -341,7 +350,6 @@ export default function GamesPage() {
             })}
           </div>
         </div>
-
         {/* Achievements */}
         <div className="border-t border-gray-100 pt-6">
           <h2 className="text-xl font-bold text-gray-900 mb-3">{t("achievements")}</h2>
@@ -490,7 +498,6 @@ function MatchPairsGame() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {deck.map((card) => (
           <Card
@@ -545,6 +552,7 @@ function SumPuzzleGame() {
       tryagain: "സരിയായി ഇല്ല. വീണ്ടും ശ്രമിക്കൂ!",
     },
   } as const
+
   const t = (k: keyof typeof tr.en) => tr[lang][k]
 
   const actions = [
@@ -600,7 +608,6 @@ function SumPuzzleGame() {
           </div>
         </CardContent>
       </Card>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {actions.map((a) => (
           <Card
@@ -620,7 +627,6 @@ function SumPuzzleGame() {
           </Card>
         ))}
       </div>
-
       <div className="flex items-center gap-3">
         <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={submit}>
           {t("submit")}
@@ -633,3 +639,4 @@ function SumPuzzleGame() {
     </div>
   )
 }
+
