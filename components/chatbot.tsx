@@ -126,7 +126,7 @@ export function Chatbot() {
           headers: {
             "Content-Type": "application/json",
             Authorization:
-              "Bearer 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",
+              "Bearer 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",
           },
           body: JSON.stringify({
             model: "openai/gpt-3.5-turbo",
@@ -187,7 +187,6 @@ export function Chatbot() {
 
   return (
     <>
-      {/* Floating Chat Button */}
       <Button
         onClick={() => setIsOpen(true)}
         className={`fixed bottom-6 right-6 h-14 w-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg z-50 ${
@@ -197,10 +196,8 @@ export function Chatbot() {
         <MessageCircle className="h-6 w-6" />
       </Button>
 
-      {/* Chat Window */}
       {isOpen && (
         <Card className="fixed bottom-6 right-6 w-96 h-[500px] flex flex-col shadow-2xl z-50 border-orange-200">
-          {/* Header */}
           <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-500 to-green-500 text-white rounded-t-lg">
             <div className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
@@ -211,7 +208,6 @@ export function Chatbot() {
             </Button>
           </div>
 
-          {/* Messages */}
           <ScrollArea className="flex-1 p-4">
             <div className="space-y-4">
               {messages.map((message) => (
@@ -250,7 +246,6 @@ export function Chatbot() {
             </div>
           </ScrollArea>
 
-          {/* Input */}
           <div className="p-4 border-t">
             <div className="flex gap-2">
               <Input
