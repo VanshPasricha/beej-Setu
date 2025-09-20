@@ -17,18 +17,25 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [step, setStep] = useState<"input" | "otp">("input")
   const [authType, setAuthType] = useState<"mobile" | "aadhar">("mobile")
+  const [countryCode, setCountryCode] = useState("+91")
   const [formData, setFormData] = useState({
     mobile: "",
     aadhar: "",
     otp: "",
     name: "",
   })
+  const [generatedOtp, setGeneratedOtp] = useState("123456") // default OTP
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate OTP sending
+    // For testing: OTP defaulted to "123456"
+    setGeneratedOtp("123456")
+
+    // Log OTP for development only
+    console.log("Generated OTP:", "123456")
+
     setTimeout(() => {
       setIsLoading(false)
       setStep("otp")
@@ -39,12 +46,15 @@ export default function AuthPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate OTP verification
-    setTimeout(() => {
+    if (formData.otp === generatedOtp) {
+      setTimeout(() => {
+        setIsLoading(false)
+        window.location.href = "/profile-setup"
+      }, 1500)
+    } else {
       setIsLoading(false)
-      // Redirect to profile setup
-      window.location.href = "/profile-setup"
-    }, 1500)
+      alert("Invalid OTP, please try again.")
+    }
   }
 
   const handleBack = () => {
@@ -55,7 +65,6 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-orange-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Back to Home */}
         <Link
           href="/"
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6 transition-colors"
@@ -115,17 +124,32 @@ export default function AuthPage() {
                         <Label htmlFor="mobile" className="text-sm font-medium text-gray-700">
                           Mobile Number
                         </Label>
-                        <div className="relative">
-                          <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                          <Input
-                            id="mobile"
-                            type="tel"
-                            placeholder="+91 98765 43210"
-                            className="pl-10 border-gray-200 focus:border-orange-300 focus:ring-orange-200"
-                            value={formData.mobile}
-                            onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                            required
-                          />
+                        <div className="flex space-x-2">
+                          <select
+                            className="border-gray-300 rounded px-3"
+                            value={countryCode}
+                            onChange={(e) => setCountryCode(e.target.value)}
+                            aria-label="Country code"
+                          >
+                            <option value="+91">+91 (India)</option>
+                            <option value="+1">+1 (USA)</option>
+                            <option value="+44">+44 (UK)</option>
+                            <option value="+61">+61 (Australia)</option>
+                            <option value="+81">+81 (Japan)</option>
+                            {/* Add more country codes as needed */}
+                          </select>
+                          <div className="relative flex-1">
+                            <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Input
+                              id="mobile"
+                              type="tel"
+                              placeholder="98765 43210"
+                              className="pl-10 border-gray-200 focus:border-orange-300 focus:ring-orange-200"
+                              value={formData.mobile}
+                              onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                              required
+                            />
+                          </div>
                         </div>
                       </div>
                     ) : (
@@ -169,7 +193,7 @@ export default function AuthPage() {
                       {authType === "mobile" ? "mobile number" : "registered mobile"}
                     </p>
                     <p className="text-sm font-medium text-gray-800 mt-1">
-                      {authType === "mobile" ? formData.mobile : `****${formData.aadhar.slice(-4)}`}
+                      {authType === "mobile" ? `${countryCode} ${formData.mobile}` : `****${formData.aadhar.slice(-4)}`}
                     </p>
                   </div>
 
