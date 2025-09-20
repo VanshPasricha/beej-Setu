@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -44,16 +43,15 @@ export function Chatbot() {
         timestamp: new Date(),
       },
     ])
-  }, []) // Empty dependency array to run only once
+  }, [])
 
-  // Initialize speech recognition
   useEffect(() => {
     if (typeof window !== "undefined" && "webkitSpeechRecognition" in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition
       recognitionRef.current = new SpeechRecognition()
       recognitionRef.current.continuous = false
       recognitionRef.current.interimResults = false
-      recognitionRef.current.lang = "hi-IN" // Default to Hindi
+      recognitionRef.current.lang = "hi-IN"
 
       recognitionRef.current.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript
@@ -87,35 +85,70 @@ export function Chatbot() {
 
   const speakText = (text: string) => {
     if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel()
+
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.lang = "hi-IN"
-      utterance.rate = 0.8
+
+      const voices = window.speechSynthesis.getVoices()
+      const preferredVoice = voices.find(
+        (voice) =>
+          voice.lang === "hi-IN" &&
+          (voice.name.toLowerCase().includes("google") || voice.name.toLowerCase().includes("female"))
+      )
+      if (preferredVoice) {
+        utterance.voice = preferredVoice
+      }
+
+      utterance.rate = 0.9
+      utterance.pitch = 1.1
+      utterance.volume = 1.0
+
+      utterance.onstart = () => {
+        console.log("Speech started")
+      }
+      utterance.onend = () => {
+        console.log("Speech ended")
+      }
+      utterance.onerror = (e) => {
+        console.error("Speech synthesis error:", e.error)
+      }
+
       speechSynthesis.speak(utterance)
     }
   }
 
   const getBotResponse = useCallback(
     async (userMessage: string): Promise<string> => {
-      // Simulate AI response based on keywords
-      const lowerMessage = userMessage.toLowerCase()
+      try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization:
+              "Bearer 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",
+          },
+          body: JSON.stringify({
+            model: "openai/gpt-3.5-turbo",
+            messages: [
+              { role: "system", content: "You are a helpful assistant." },
+              { role: "user", content: userMessage },
+            ],
+          }),
+        })
 
-      if (lowerMessage.includes("weather") || lowerMessage.includes("मौसम")) {
-        return t("chatbot.responses.weather")
-      } else if (lowerMessage.includes("crop") || lowerMessage.includes("फसल")) {
-        return t("chatbot.responses.crop")
-      } else if (lowerMessage.includes("scheme") || lowerMessage.includes("योजना")) {
-        return t("chatbot.responses.scheme")
-      } else if (lowerMessage.includes("pest") || lowerMessage.includes("कीट")) {
-        return t("chatbot.responses.pest")
-      } else if (lowerMessage.includes("water") || lowerMessage.includes("पानी")) {
-        return t("chatbot.responses.water")
-      } else if (lowerMessage.includes("soil") || lowerMessage.includes("मिट्टी")) {
-        return t("chatbot.responses.soil")
-      } else {
-        return t("chatbot.responses.default")
+        if (!response.ok) {
+          throw new Error(`OpenRouter API error: ${response.statusText}`)
+        }
+
+        const data = await response.json()
+        return data.choices[0].message.content
+      } catch (error) {
+        console.error("Error fetching from OpenRouter:", error)
+        return "Sorry, I am having trouble responding right now."
       }
     },
-    [t],
+    []
   )
 
   const handleSendMessage = async () => {
@@ -133,20 +166,17 @@ export function Chatbot() {
     setInputValue("")
     setIsLoading(true)
 
-    // Simulate API delay
-    setTimeout(async () => {
-      const botResponse = await getBotResponse(currentInput)
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: botResponse,
-        sender: "bot",
-        timestamp: new Date(),
-      }
+    const botResponse = await getBotResponse(currentInput)
+    const botMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      text: botResponse,
+      sender: "bot",
+      timestamp: new Date(),
+    }
 
-      setMessages((prev) => [...prev, botMessage])
-      setIsLoading(false)
-      speakText(botResponse)
-    }, 1000)
+    setMessages((prev) => [...prev, botMessage])
+    setIsLoading(false)
+    speakText(botResponse)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -210,14 +240,8 @@ export function Chatbot() {
                   <div className="bg-gray-100 p-3 rounded-lg">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
                     </div>
                   </div>
                 </div>
