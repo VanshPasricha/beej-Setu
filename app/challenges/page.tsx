@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -22,6 +22,7 @@ import {
   TrendingUp,
 } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { useLanguage } from "@/contexts/language-context"
 
 const challengeCategories = [
   { id: "water", name: "Water Conservation", icon: Droplets, color: "text-blue-600", bgColor: "bg-blue-100" },
@@ -162,6 +163,111 @@ const completedChallenges = [
 export default function ChallengesPage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedChallenge, setSelectedChallenge] = useState<number | null>(null)
+  const { lang } = useLanguage()
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(t)
+  }, [])
+
+  const tr = {
+    en: {
+      title: "Sustainability Challenges",
+      subtitle: "Complete challenges to earn points and badges",
+      yourTotalPoints: "Your total points",
+      allCategories: "All Categories",
+      available: "Available",
+      active: "Active",
+      completed: "Completed",
+      daysLeft: "days left",
+      progress: "Progress",
+      complete: "complete",
+      started: "Started",
+      viewDetails: "View Details",
+      updateProgress: "Update Progress",
+      challengeDetails: "Challenge Details",
+      requirements: "Requirements",
+      rewards: "Rewards",
+      joinChallenge: "Join Challenge",
+      cancel: "Cancel",
+      pts: "pts",
+      points: "points",
+      completedOn: "Completed on",
+      statusCompleted: "Completed",
+    },
+    hi: {
+      title: "सततता चुनौतियाँ",
+      subtitle: "अंक और बैज कमाने के लिए चुनौतियाँ पूरी करें",
+      yourTotalPoints: "आपके कुल अंक",
+      allCategories: "सभी श्रेणियाँ",
+      available: "उपलब्ध",
+      active: "सक्रिय",
+      completed: "पूर्ण",
+      daysLeft: "दिन शेष",
+      progress: "प्रगति",
+      complete: "पूर्ण",
+      started: "शुरू हुआ",
+      viewDetails: "विवरण देखें",
+      updateProgress: "प्रगति अपडेट करें",
+      challengeDetails: "चुनौती विवरण",
+      requirements: "आवश्यकताएँ",
+      rewards: "पुरस्कार",
+      joinChallenge: "चुनौती में शामिल हों",
+      cancel: "रद्द करें",
+      pts: "अंक",
+      points: "अंक",
+      completedOn: "पूर्ण हुआ",
+      statusCompleted: "पूर्ण",
+    },
+    ml: {
+      title: "സുസ്ഥിരത ചലഞ്ചുകൾ",
+      subtitle: "പോയിന്റുകളും ബാഡ്ജുകളും നേടാൻ ചലഞ്ചുകൾ പൂർത്തിയാക്കുക",
+      yourTotalPoints: "നിങ്ങളുടെ ആകെ പോയിന്റുകൾ",
+      allCategories: "എല്ലാ വിഭാഗങ്ങളും",
+      available: "ലഭ്യം",
+      active: "സജീവം",
+      completed: "പൂർത്തിയായി",
+      daysLeft: "ദിവസങ്ങൾ ബാക്കി",
+      progress: "പുരോഗതി",
+      complete: "പൂർത്തിയായി",
+      started: "തുടങ്ങി",
+      viewDetails: "വിശദാംശങ്ങൾ കാണുക",
+      updateProgress: "പുരോഗതി അപ്ഡേറ്റ് ചെയ്യുക",
+      challengeDetails: "ചലഞ്ച് വിശദാംശങ്ങൾ",
+      requirements: "ആവശ്യകതകൾ",
+      rewards: "ബഹുമതികൾ",
+      joinChallenge: "ചലഞ്ചിൽ ചേരുക",
+      cancel: "റദ്ദാക്കുക",
+      pts: "പോയിന്റ്സ്",
+      points: "പോയിന്റ്സ്",
+      completedOn: "പൂർത്തിയായ തീയതി",
+      statusCompleted: "പൂർത്തിയായി",
+    },
+  } as const
+  const tt = (k: keyof typeof tr.en) => tr[lang][k]
+
+  // Dynamic text helpers kept out of translation map
+  const farmersParticipatingText = (n: number) => {
+    switch (lang) {
+      case "hi":
+        return `${n} किसान भाग ले रहे हैं`
+      case "ml":
+        return `${n} കർഷകർ പങ്കെടുക്കുന്നു`
+      default:
+        return `${n} farmers participating`
+    }
+  }
+
+  const participantsNowText = (n: number) => {
+    switch (lang) {
+      case "hi":
+        return `${n} किसान वर्तमान में भाग ले रहे हैं`
+      case "ml":
+        return `${n} കർഷകർ ഇപ്പോൾ പങ്കെടുക്കുന്നു`
+      default:
+        return `${n} farmers are currently participating in this challenge`
+    }
+  }
 
   const getCategoryIcon = (categoryId: string) => {
     const category = challengeCategories.find((cat) => cat.id === categoryId)
@@ -205,12 +311,12 @@ export default function ChallengesPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Sustainability Challenges</h1>
-            <p className="text-gray-600 mt-1">Complete challenges to earn points and badges</p>
+            <h1 className="text-3xl font-bold text-gray-900">{tt("title")}</h1>
+            <p className="text-gray-600 mt-1">{tt("subtitle")}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-orange-600">750 pts</div>
-            <div className="text-sm text-gray-500">Your total points</div>
+            <div className="text-2xl font-bold text-orange-600">750 {tt("pts")}</div>
+            <div className="text-sm text-gray-500">{tt("yourTotalPoints")}</div>
           </div>
         </div>
 
@@ -220,9 +326,9 @@ export default function ChallengesPage() {
             variant={selectedCategory === "all" ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedCategory("all")}
-            className={selectedCategory === "all" ? "bg-orange-500 hover:bg-orange-600" : ""}
+            className={(selectedCategory === "all" ? "bg-orange-500 hover:bg-orange-600 " : "") + "button-press"}
           >
-            All Categories
+            {tt("allCategories")}
           </Button>
           {challengeCategories.map((category) => {
             const IconComponent = category.icon
@@ -232,7 +338,7 @@ export default function ChallengesPage() {
                 variant={selectedCategory === category.id ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center space-x-2 ${
+                className={`flex items-center space-x-2 button-press ${
                   selectedCategory === category.id ? "bg-orange-500 hover:bg-orange-600" : ""
                 }`}
               >
@@ -243,52 +349,72 @@ export default function ChallengesPage() {
           })}
         </div>
 
-        <Tabs defaultValue="available" className="w-full">
+        <Tabs defaultValue="available" className="w-full border-t border-gray-100 pt-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="available">Available ({availableChallenges.length})</TabsTrigger>
-            <TabsTrigger value="active">Active ({activeChallenges.length})</TabsTrigger>
-            <TabsTrigger value="completed">Completed ({completedChallenges.length})</TabsTrigger>
+            <TabsTrigger value="available">{tt("available")} ({availableChallenges.length})</TabsTrigger>
+            <TabsTrigger value="active">{tt("active")} ({activeChallenges.length})</TabsTrigger>
+            <TabsTrigger value="completed">{tt("completed")} ({completedChallenges.length})</TabsTrigger>
           </TabsList>
 
           {/* Available Challenges */}
           <TabsContent value="available" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredChallenges.map((challenge) => (
-                <Card key={challenge.id} className="border-0 shadow-md hover:shadow-lg transition-shadow">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
+              {(loading ? Array.from({ length: 6 }).map((_, i) => ({ id: `s${i}` })) : filteredChallenges).map((challenge: any) => (
+                <Card key={challenge.id} className="border-0 shadow-md hover:shadow-lg transition-shadow rounded-lg">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
-                      <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center ${getCategoryBg(challenge.category)}`}
-                      >
-                        {getCategoryIcon(challenge.category)}
-                      </div>
-                      <Badge className={getDifficultyColor(challenge.difficulty)}>{challenge.difficulty}</Badge>
+                      {loading ? (
+                        <div className="w-full flex items-center justify-between">
+                          <div className="skeleton w-12 h-12 rounded-full" />
+                          <div className="skeleton h-5 w-16" />
+                        </div>
+                      ) : (
+                        <>
+                          <div
+                            className={`w-12 h-12 rounded-full flex items-center justify-center ${getCategoryBg(challenge.category)}`}
+                          >
+                            {getCategoryIcon(challenge.category)}
+                          </div>
+                          <Badge className={getDifficultyColor(challenge.difficulty)}>{challenge.difficulty}</Badge>
+                        </>
+                      )}
                     </div>
-                    <CardTitle className="text-lg">{challenge.title}</CardTitle>
+                    <CardTitle className="text-lg">{loading ? <span className="skeleton h-4 w-40 inline-block" /> : challenge.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-sm text-gray-600">{challenge.description}</p>
+                    {loading ? (
+                      <div className="space-y-2">
+                        <div className="skeleton h-3 w-5/6" />
+                        <div className="skeleton h-3 w-2/3" />
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-600">{challenge.description}</p>
+                    )}
 
                     <div className="flex items-center justify-between text-sm">
                       <div className="flex items-center space-x-1 text-gray-500">
                         <Clock className="w-4 h-4" />
-                        <span>{challenge.duration}</span>
+                        <span>{loading ? <span className="skeleton h-3 w-16 inline-block" /> : challenge.duration}</span>
                       </div>
                       <div className="flex items-center space-x-1 text-orange-600 font-semibold">
                         <Trophy className="w-4 h-4" />
-                        <span>{challenge.points} pts</span>
+                        <span>{loading ? <span className="skeleton h-3 w-16 inline-block" /> : `${challenge.points} ${tt("points")}`}</span>
                       </div>
                     </div>
 
-                    <div className="text-xs text-gray-500">{challenge.participants} farmers participating</div>
+                    <div className="text-xs text-gray-500">{loading ? <span className="skeleton h-3 w-40 inline-block" /> : farmersParticipatingText(challenge.participants)}</div>
 
-                    <Button
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-                      onClick={() => setSelectedChallenge(challenge.id)}
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      View Details
-                    </Button>
+                    {loading ? (
+                      <div className="skeleton h-10 w-full" />
+                    ) : (
+                      <Button
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white button-press rounded-lg"
+                        onClick={() => setSelectedChallenge(challenge.id)}
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        {tt("viewDetails")}
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -297,50 +423,72 @@ export default function ChallengesPage() {
 
           {/* Active Challenges */}
           <TabsContent value="active" className="space-y-4">
-            {activeChallenges.map((challenge) => (
-              <Card key={challenge.id} className="border-0 shadow-md">
+            {(loading ? Array.from({ length: 2 }).map((_, i) => ({ id: `as${i}` })) : activeChallenges).map((challenge: any) => (
+              <Card key={challenge.id} className="border-0 shadow-md rounded-lg">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
-                      <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center ${getCategoryBg(challenge.category)}`}
-                      >
-                        {getCategoryIcon(challenge.category)}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{challenge.title}</h3>
-                        <p className="text-sm text-gray-600">{challenge.description}</p>
-                      </div>
+                      {loading ? (
+                        <>
+                          <div className="skeleton w-12 h-12 rounded-full" />
+                          <div>
+                            <div className="skeleton h-4 w-44 mb-1" />
+                            <div className="skeleton h-3 w-56" />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div
+                            className={`w-12 h-12 rounded-full flex items-center justify-center ${getCategoryBg(challenge.category)}`}
+                          >
+                            {getCategoryIcon(challenge.category)}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-900">{challenge.title}</h3>
+                            <p className="text-sm text-gray-600">{challenge.description}</p>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {challenge.daysLeft} days left
-                    </Badge>
+                    {loading ? <div className="skeleton h-5 w-16" /> : <Badge variant="secondary" className="text-xs">{challenge.daysLeft} {tt("daysLeft")}</Badge>}
                   </div>
 
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Progress</span>
-                      <span className="font-semibold">{challenge.progress}% complete</span>
-                    </div>
-                    <Progress value={challenge.progress} className="h-3" />
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center space-x-1 text-gray-500">
-                        <Calendar className="w-4 h-4" />
-                        <span>Started {challenge.startDate}</span>
-                      </div>
-                      <div className="flex items-center space-x-1 text-orange-600 font-semibold">
-                        <Trophy className="w-4 h-4" />
-                        <span>{challenge.points} pts</span>
-                      </div>
-                    </div>
+                    {loading ? (
+                      <>
+                        <div className="skeleton h-3 w-full" />
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="skeleton h-3 w-24" />
+                          <div className="skeleton h-3 w-16" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">{tt("progress")}</span>
+                          <span className="font-semibold">{challenge.progress}% {tt("complete")}</span>
+                        </div>
+                        <Progress value={challenge.progress} className="h-3" />
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center space-x-1 text-gray-500">
+                            <Calendar className="w-4 h-4" />
+                            <span>{tt("started")} {challenge.startDate}</span>
+                          </div>
+                          <div className="flex items-center space-x-1 text-orange-600 font-semibold">
+                            <Trophy className="w-4 h-4" />
+                            <span>{challenge.points} {tt("pts")}</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="flex space-x-2 mt-4">
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-                      Update Progress
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white button-press">
+                      {tt("updateProgress")}
                     </Button>
-                    <Button variant="outline" size="sm">
-                      View Details
+                    <Button variant="outline" size="sm" className="button-press">
+                      {tt("viewDetails")}
                     </Button>
                   </div>
                 </CardContent>
@@ -351,7 +499,7 @@ export default function ChallengesPage() {
           {/* Completed Challenges */}
           <TabsContent value="completed" className="space-y-4">
             {completedChallenges.map((challenge) => (
-              <Card key={challenge.id} className="border-0 shadow-md bg-green-50">
+              <Card key={challenge.id} className="border-0 shadow-md bg-green-50 rounded-lg">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -361,15 +509,15 @@ export default function ChallengesPage() {
                       <div>
                         <h3 className="font-semibold text-gray-900">{challenge.title}</h3>
                         <p className="text-sm text-gray-600">{challenge.description}</p>
-                        <p className="text-xs text-gray-500 mt-1">Completed on {challenge.completedDate}</p>
+                        <p className="text-xs text-gray-500 mt-1">{tt("completedOn")} {challenge.completedDate}</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="flex items-center space-x-1 text-green-600 font-semibold">
                         <Trophy className="w-4 h-4" />
-                        <span>+{challenge.points} pts</span>
+                        <span>+{challenge.points} {tt("pts")}</span>
                       </div>
-                      <Badge className="bg-green-100 text-green-800 mt-1">Completed</Badge>
+                      <Badge className="bg-green-100 text-green-800 mt-1">{tt("statusCompleted")}</Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -384,7 +532,7 @@ export default function ChallengesPage() {
             <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>Challenge Details</CardTitle>
+                  <CardTitle>{tt("challengeDetails")}</CardTitle>
                   <Button variant="ghost" size="sm" onClick={() => setSelectedChallenge(null)}>
                     ×
                   </Button>
@@ -414,14 +562,14 @@ export default function ChallengesPage() {
                             </div>
                             <div className="flex items-center space-x-1 text-sm text-orange-600 font-semibold">
                               <Trophy className="w-4 h-4" />
-                              <span>{challenge.points} points</span>
+                              <span>{challenge.points} {tt("points")}</span>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Requirements</h3>
+                        <h3 className="font-semibold text-gray-900 mb-2">{tt("requirements")}</h3>
                         <ul className="space-y-1">
                           {challenge.requirements.map((req, index) => (
                             <li key={index} className="text-sm text-gray-600 flex items-center space-x-2">
@@ -433,7 +581,7 @@ export default function ChallengesPage() {
                       </div>
 
                       <div>
-                        <h3 className="font-semibold text-gray-900 mb-2">Rewards</h3>
+                        <h3 className="font-semibold text-gray-900 mb-2">{tt("rewards")}</h3>
                         <ul className="space-y-1">
                           {challenge.rewards.map((reward, index) => (
                             <li key={index} className="text-sm text-gray-600 flex items-center space-x-2">
@@ -447,7 +595,7 @@ export default function ChallengesPage() {
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <div className="flex items-center space-x-2 text-sm text-gray-600">
                           <TrendingUp className="w-4 h-4" />
-                          <span>{challenge.participants} farmers are currently participating in this challenge</span>
+                          <span>{participantsNowText(challenge.participants)}</span>
                         </div>
                       </div>
 
@@ -457,10 +605,10 @@ export default function ChallengesPage() {
                           onClick={() => handleJoinChallenge(challenge.id)}
                         >
                           <Play className="w-4 h-4 mr-2" />
-                          Join Challenge
+                          {tt("joinChallenge")}
                         </Button>
                         <Button variant="outline" onClick={() => setSelectedChallenge(null)}>
-                          Cancel
+                          {tt("cancel")}
                         </Button>
                       </div>
                     </div>

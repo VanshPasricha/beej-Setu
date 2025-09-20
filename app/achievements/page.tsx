@@ -1,10 +1,12 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Droplets, Leaf, Zap, Recycle, Trophy, Award, Star, Target, Crown, Shield, Flame, Lock } from "lucide-react"
 import { DashboardLayout } from "@/components/dashboard-layout"
+import { useLanguage } from "@/contexts/language-context"
 
 const achievements = [
   {
@@ -180,6 +182,81 @@ const getRarityColor = (rarity: string) => {
 }
 
 export default function AchievementsPage() {
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(t)
+  }, [])
+  const { lang } = useLanguage()
+  const tr = {
+    en: {
+      title: "Achievements & Progress",
+      subtitle: "Track your sustainability milestones and unlock rewards",
+      achievementsEarned: "Achievements Earned",
+      currentLevel: "Current Level",
+      totalPoints: "Total Points",
+      progressTo: "Progress to",
+      pointsToNextLevel: "points to next level",
+      earned: "Earned",
+      inProgress: "In Progress",
+      locked: "Locked",
+      pointsFromAchievements: "Points from Achievements",
+      earnedAchievements: "Earned Achievements",
+      inProgressAchievements: "In Progress",
+      lockedAchievements: "Locked Achievements",
+      completedCheck: "✓ Completed",
+      pts: "pts",
+      earnedOn: "Earned on",
+      progress: "Progress",
+      requirementLabel: "Requirement",
+      statusCompleted: "Completed",
+    },
+    hi: {
+      title: "उपलब्धियाँ और प्रगति",
+      subtitle: "अपनी स्थिरता उपलब्धियों को ट्रैक करें और इनाम पाएं",
+      achievementsEarned: "प्राप्त उपलब्धियाँ",
+      currentLevel: "वर्तमान स्तर",
+      totalPoints: "कुल अंक",
+      progressTo: "प्रगति",
+      pointsToNextLevel: "अगले स्तर तक अंक",
+      earned: "प्राप्त",
+      inProgress: "प्रगति पर",
+      locked: "लॉक",
+      pointsFromAchievements: "उपलब्धियों से अंक",
+      earnedAchievements: "प्राप्त उपलब्धियाँ",
+      inProgressAchievements: "प्रगति पर",
+      lockedAchievements: "लॉक उपलब्धियाँ",
+      completedCheck: "✓ पूर्ण",
+      pts: "अंक",
+      earnedOn: "प्राप्ति तिथि",
+      progress: "प्रगति",
+      requirementLabel: "आवश्यकता",
+      statusCompleted: "पूर्ण",
+    },
+    ml: {
+      title: "അchieവ്‌മെന്റുകളും പുരോഗതിയും",
+      subtitle: "നിങ്ങളുടെ സുസ്ഥിരത നേട്ടങ്ങളും പാരിതോഷികങ്ങളും പിന്തുടരുക",
+      achievementsEarned: "നേട്ടങ്ങൾ ലഭിച്ചു",
+      currentLevel: "നിലവിലെ ലെവൽ",
+      totalPoints: "ആകെ പോയിന്റ്സ്",
+      progressTo: "പുരോഗതി",
+      pointsToNextLevel: "അടുത്ത ലെവലിലേക്ക് പോയിന്റ്",
+      earned: "ലഭിച്ചു",
+      inProgress: "പുരോഗതി നടക്കുന്നു",
+      locked: "ലോക്ക് ചെയ്തത്",
+      pointsFromAchievements: "നേട്ടങ്ങളിൽ നിന്ന് പോയിന്റ്സ്",
+      earnedAchievements: "ലഭിച്ച നേട്ടങ്ങൾ",
+      inProgressAchievements: "പുരോഗതിയിലെ",
+      lockedAchievements: "ലോക്കുചെയ്ത നേട്ടങ്ങൾ",
+      completedCheck: "✓ പൂർത്തിയായി",
+      pts: "പോയിന്റ്സ്",
+      earnedOn: "ലഭിച്ച തീയതി",
+      progress: "പുരോഗതി",
+      requirementLabel: "ആവശ്യകത",
+      statusCompleted: "പൂർത്തിയായി",
+    },
+  } as const
+  const tt = (k: keyof typeof tr.en) => tr[lang][k]
   const earnedAchievements = achievements.filter((achievement) => achievement.earned)
   const inProgressAchievements = achievements.filter((achievement) => !achievement.earned && achievement.progress > 0)
   const lockedAchievements = achievements.filter((achievement) => !achievement.earned && achievement.progress === 0)
@@ -195,12 +272,12 @@ export default function AchievementsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Achievements & Progress</h1>
-            <p className="text-gray-600 mt-1">Track your sustainability milestones and unlock rewards</p>
+            <h1 className="text-3xl font-bold text-gray-900">{tt("title")}</h1>
+            <p className="text-gray-600 mt-1">{tt("subtitle")}</p>
           </div>
           <div className="text-right">
             <div className="text-2xl font-bold text-orange-600">{earnedAchievements.length}</div>
-            <div className="text-sm text-gray-500">Achievements Earned</div>
+            <div className="text-sm text-gray-500">{tt("achievementsEarned")}</div>
           </div>
         </div>
 
@@ -210,24 +287,24 @@ export default function AchievementsPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-2xl font-bold">{currentLevel?.name}</h2>
-                <p className="text-orange-100">Current Level</p>
+                <p className="text-orange-100">{tt("currentLevel")}</p>
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold">{levelSystem.currentPoints}</div>
-                <div className="text-sm text-orange-100">Total Points</div>
+                <div className="text-sm text-orange-100">{tt("totalPoints")}</div>
               </div>
             </div>
             {nextLevel && (
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Progress to {nextLevel.name}</span>
+                  <span>{tt("progressTo")} {nextLevel.name}</span>
                   <span>
                     {levelSystem.currentPoints} / {nextLevel.minPoints}
                   </span>
                 </div>
                 <Progress value={(levelSystem.currentPoints / nextLevel.minPoints) * 100} className="h-3 bg-white/20" />
                 <p className="text-xs text-orange-100">
-                  {nextLevel.minPoints - levelSystem.currentPoints} points to next level
+                  {nextLevel.minPoints - levelSystem.currentPoints} {tt("pointsToNextLevel")}
                 </p>
               </div>
             )}
@@ -235,72 +312,109 @@ export default function AchievementsPage() {
         </Card>
 
         {/* Achievement Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Trophy className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="text-2xl font-bold text-gray-900">{earnedAchievements.length}</div>
-              <div className="text-sm text-gray-600">Earned</div>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Target className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="text-2xl font-bold text-gray-900">{inProgressAchievements.length}</div>
-              <div className="text-sm text-gray-600">In Progress</div>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Lock className="w-6 h-6 text-gray-600" />
-              </div>
-              <div className="text-2xl font-bold text-gray-900">{lockedAchievements.length}</div>
-              <div className="text-sm text-gray-600">Locked</div>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-4 text-center">
-              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                <Flame className="w-6 h-6 text-orange-600" />
-              </div>
-              <div className="text-2xl font-bold text-gray-900">
-                {earnedAchievements.reduce((sum, achievement) => sum + achievement.points, 0)}
-              </div>
-              <div className="text-sm text-gray-600">Points from Achievements</div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-gray-100 pt-6 stagger">
+          {loading ? (
+            [0, 1, 2, 3].map((i) => (
+              <Card key={i} className="border-0 shadow-md rounded-lg">
+                <CardContent className="p-4 text-center">
+                  <div className="skeleton w-12 h-12 rounded-full mx-auto mb-2" />
+                  <div className="skeleton h-6 w-16 mx-auto mb-1" />
+                  <div className="skeleton h-3 w-24 mx-auto" />
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <>
+              <Card className="border-0 shadow-md rounded-lg">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Trophy className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">{earnedAchievements.length}</div>
+                  <div className="text-sm text-gray-600">{tt("earned")}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-md rounded-lg">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Target className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">{inProgressAchievements.length}</div>
+                  <div className="text-sm text-gray-600">{tt("inProgress")}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-md rounded-lg">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Lock className="w-6 h-6 text-gray-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">{lockedAchievements.length}</div>
+                  <div className="text-sm text-gray-600">{tt("locked")}</div>
+                </CardContent>
+              </Card>
+              <Card className="border-0 shadow-md rounded-lg">
+                <CardContent className="p-4 text-center">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Flame className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {earnedAchievements.reduce((sum, achievement) => sum + achievement.points, 0)}
+                  </div>
+                  <div className="text-sm text-gray-600">{tt("pointsFromAchievements")}</div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Earned Achievements */}
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Earned Achievements ({earnedAchievements.length})</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {earnedAchievements.map((achievement) => {
+        <div className="border-t border-gray-100 pt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{tt("earnedAchievements")} ({earnedAchievements.length})</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
+            {(loading ? Array.from({ length: 6 }).map((_, i) => ({ id: `e${i}` })) : earnedAchievements).map((achievement: any) => {
               const IconComponent = achievement.icon
               return (
                 <Card
                   key={achievement.id}
-                  className={`border-2 shadow-md bg-gradient-to-br from-white to-green-50 ${achievement.borderColor}`}
+                  className={`border-2 shadow-md rounded-lg ${
+                    loading ? "border-gray-100" : `bg-gradient-to-br from-white to-green-50 ${achievement.borderColor}`
+                  }`}
                 >
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${achievement.bgColor}`}>
-                        <IconComponent className={`w-6 h-6 ${achievement.color}`} />
-                      </div>
-                      <Badge className={getRarityColor(achievement.rarity)}>{achievement.rarity}</Badge>
-                    </div>
-                    <h3 className="font-bold text-gray-900 mb-1">{achievement.name}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{achievement.description}</p>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="text-green-600 font-semibold">✓ Completed</div>
-                      <div className="text-orange-600 font-semibold">+{achievement.points} pts</div>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-2">Earned on {achievement.earnedDate}</div>
+                    {loading ? (
+                      <>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="skeleton w-12 h-12 rounded-full" />
+                          <div className="skeleton h-4 w-20" />
+                        </div>
+                        <div className="skeleton h-4 w-40 mb-2" />
+                        <div className="skeleton h-3 w-56 mb-3" />
+                        <div className="skeleton h-2 w-full" />
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${achievement.bgColor}`}>
+                            <IconComponent className={`w-6 h-6 ${achievement.color}`} />
+                          </div>
+                          <Badge className={getRarityColor(achievement.rarity)}>{achievement.rarity}</Badge>
+                        </div>
+                        <h3 className="font-bold text-gray-900 mb-1">{achievement.name}</h3>
+                        <p className="text-sm text-gray-600 mb-3">{achievement.description}</p>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">{tt("progress")}</span>
+                          <span className="font-semibold">{achievement.progress}%</span>
+                        </div>
+                        <Progress value={achievement.progress} className="h-2" />
+                        <div className="flex justify-between text-xs text-gray-500">
+                          <span>{achievement.currentValue}</span>
+                          <span>{achievement.requirement}</span>
+                        </div>
+                        <div className="text-right mt-3">
+                          <div className="text-orange-600 font-semibold text-sm">+{achievement.points} {tt("pts")}</div>
+                        </div>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               )
@@ -309,36 +423,50 @@ export default function AchievementsPage() {
         </div>
 
         {/* In Progress Achievements */}
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">In Progress ({inProgressAchievements.length})</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {inProgressAchievements.map((achievement) => {
+        <div className="border-t border-gray-100 pt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{tt("inProgressAchievements")} ({inProgressAchievements.length})</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
+            {(loading ? Array.from({ length: 6 }).map((_, i) => ({ id: `p${i}` })) : inProgressAchievements).map((achievement: any) => {
               const IconComponent = achievement.icon
               return (
-                <Card key={achievement.id} className={`border-2 shadow-md ${achievement.borderColor}`}>
+                <Card key={achievement.id} className={`border-2 shadow-md rounded-lg ${loading ? "border-gray-100" : achievement.borderColor}`}>
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${achievement.bgColor}`}>
-                        <IconComponent className={`w-6 h-6 ${achievement.color}`} />
-                      </div>
-                      <Badge className={getRarityColor(achievement.rarity)}>{achievement.rarity}</Badge>
-                    </div>
-                    <h3 className="font-bold text-gray-900 mb-1">{achievement.name}</h3>
-                    <p className="text-sm text-gray-600 mb-3">{achievement.description}</p>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Progress</span>
-                        <span className="font-semibold">{achievement.progress}%</span>
-                      </div>
-                      <Progress value={achievement.progress} className="h-2" />
-                      <div className="flex justify-between text-xs text-gray-500">
-                        <span>{achievement.currentValue}</span>
-                        <span>{achievement.requirement}</span>
-                      </div>
-                    </div>
-                    <div className="text-right mt-3">
-                      <div className="text-orange-600 font-semibold text-sm">+{achievement.points} pts</div>
-                    </div>
+                    {loading ? (
+                      <>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="skeleton w-12 h-12 rounded-full" />
+                          <div className="skeleton h-4 w-20" />
+                        </div>
+                        <div className="skeleton h-4 w-40 mb-2" />
+                        <div className="skeleton h-3 w-56 mb-3" />
+                        <div className="skeleton h-2 w-full" />
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${achievement.bgColor}`}>
+                            <IconComponent className={`w-6 h-6 ${achievement.color}`} />
+                          </div>
+                          <Badge className={getRarityColor(achievement.rarity)}>{achievement.rarity}</Badge>
+                        </div>
+                        <h3 className="font-bold text-gray-900 mb-1">{achievement.name}</h3>
+                        <p className="text-sm text-gray-600 mb-3">{achievement.description}</p>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">{tt("progress")}</span>
+                            <span className="font-semibold">{achievement.progress}%</span>
+                          </div>
+                          <Progress value={achievement.progress} className="h-2" />
+                          <div className="flex justify-between text-xs text-gray-500">
+                            <span>{achievement.currentValue}</span>
+                            <span>{achievement.requirement}</span>
+                          </div>
+                        </div>
+                        <div className="text-right mt-3">
+                          <div className="text-orange-600 font-semibold text-sm">+{achievement.points} {tt("pts")}</div>
+                        </div>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               )
@@ -347,26 +475,43 @@ export default function AchievementsPage() {
         </div>
 
         {/* Locked Achievements */}
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Locked Achievements ({lockedAchievements.length})</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {lockedAchievements.map((achievement) => {
+        <div className="border-t border-gray-100 pt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{tt("lockedAchievements")} ({lockedAchievements.length})</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger">
+            {(loading ? Array.from({ length: 6 }).map((_, i) => ({ id: `l${i}` })) : lockedAchievements).map((achievement: any) => {
               const IconComponent = achievement.icon
               return (
-                <Card key={achievement.id} className="border-2 border-gray-200 shadow-md bg-gray-50 opacity-75">
+                <Card key={achievement.id} className="border-2 border-gray-200 shadow-md bg-gray-50 opacity-75 rounded-lg">
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-200">
-                        <Lock className="w-6 h-6 text-gray-400" />
-                      </div>
-                      <Badge className={getRarityColor(achievement.rarity)}>{achievement.rarity}</Badge>
-                    </div>
-                    <h3 className="font-bold text-gray-600 mb-1">{achievement.name}</h3>
-                    <p className="text-sm text-gray-500 mb-3">{achievement.description}</p>
-                    <div className="text-sm text-gray-500">Requirement: {achievement.requirement}</div>
-                    <div className="text-right mt-3">
-                      <div className="text-gray-500 font-semibold text-sm">+{achievement.points} pts</div>
-                    </div>
+                    {loading ? (
+                      <>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="skeleton w-12 h-12 rounded-full" />
+                          <div className="skeleton h-4 w-20" />
+                        </div>
+                        <div className="skeleton h-4 w-40 mb-2" />
+                        <div className="skeleton h-3 w-56 mb-3" />
+                        <div className="skeleton h-3 w-48" />
+                        <div className="text-right mt-3">
+                          <div className="skeleton h-4 w-24 inline-block" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-200">
+                            <Lock className="w-6 h-6 text-gray-400" />
+                          </div>
+                          <Badge className={getRarityColor(achievement.rarity)}>{achievement.rarity}</Badge>
+                        </div>
+                        <h3 className="font-bold text-gray-600 mb-1">{achievement.name}</h3>
+                        <p className="text-sm text-gray-500 mb-3">{achievement.description}</p>
+                        <div className="text-sm text-gray-500">{tt("requirementLabel")}: {achievement.requirement}</div>
+                        <div className="text-right mt-3">
+                          <div className="text-gray-500 font-semibold text-sm">+{achievement.points} {tt("pts")}</div>
+                        </div>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               )

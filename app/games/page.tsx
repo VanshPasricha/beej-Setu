@@ -1,21 +1,10 @@
 "use client"
-
-import { useState, useEffect, useRef } from "react"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import {
-  Droplets,
-  Leaf,
-  Shield,
-  Zap,
-  Play,
-  Trophy,
-  Clock,
-  Target,
-  Home,
-} from "lucide-react"
+import { Play, Trophy, Star, Clock, Award, TrendingUp, Users, Home, RefreshCcw, Puzzle, Calculator } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 import { DashboardLayout } from "@/components/dashboard-layout"
 
 type Game = {
@@ -39,87 +28,100 @@ type Game = {
 
 const miniGames: Game[] = [
   {
-    id: "water-saver",
-    title: "Water Saver",
-    description: "Manage limited water resources and allocate efficiently across crops",
-    icon: Droplets,
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
-    borderColor: "border-blue-400",
+    id: "match-pairs",
+    title: "Match the Following",
+    description: "Flip cards to match sustainable farming terms with their meanings",
+    icon: Puzzle,
+    color: "text-pink-600",
+    bgColor: "bg-pink-100",
+    borderColor: "border-pink-200",
     difficulty: "Easy",
-    duration: "5-10 min",
-    points: 50,
-    players: 1247,
-    rating: 4.6,
-    completed: false,
-    bestScore: 0,
-    objective: "Distribute water efficiently to maximize yield",
-    skills: ["Resource Management", "Strategic Planning", "Water Conservation"],
-  },
-  {
-    id: "soil-builder",
-    title: "Soil Builder",
-    description: "Improve soil quality by adding compost, rotating crops, and avoiding chemicals",
-    icon: Leaf,
-    color: "text-green-600",
-    bgColor: "bg-green-100",
-    borderColor: "border-green-400",
-    difficulty: "Medium",
-    duration: "10-15 min",
-    points: 75,
-    players: 892,
-    rating: 4.8,
-    completed: true,
-    bestScore: 850,
-    objective: "Build healthy soil using sustainable practices",
-    skills: ["Soil Science", "Organic Farming", "Crop Rotation"],
-  },
-  {
-    id: "biodiversity-defender",
-    title: "Biodiversity Defender",
-    description: "Protect farm ecosystem by introducing pollinators and beneficial insects",
-    icon: Shield,
-    color: "text-purple-600",
-    bgColor: "bg-purple-100",
-    borderColor: "border-purple-400",
-    difficulty: "Medium",
-    duration: "8-12 min",
+    duration: "5-8 min",
     points: 60,
-    players: 634,
-    rating: 4.5,
-    completed: false,
-    bestScore: 0,
-    objective: "Balance ecosystem for pest control",
-    skills: ["Ecosystem Management", "Pollinator Support", "Natural Pest Control"],
-  },
-  {
-    id: "energy-farmer",
-    title: "Energy Farmer",
-    description: "Optimize energy usage with renewable sources and efficient irrigation",
-    icon: Zap,
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-100",
-    borderColor: "border-yellow-400",
-    difficulty: "Hard",
-    duration: "15-20 min",
-    points: 100,
-    players: 456,
+    players: 1320,
     rating: 4.7,
     completed: false,
     bestScore: 0,
-    objective: "Maximize energy efficiency in farm operations",
-    skills: ["Energy Management", "Renewable Energy", "Cost Optimization"],
+    objective: "Learn sustainability concepts by matching pairs",
+    skills: ["Memory", "Concept Mapping", "Sustainability Basics"],
+  },
+  {
+    id: "sum-puzzle",
+    title: "Sustainability Sum Puzzle",
+    description: "Select actions to exactly reach the target sustainability score",
+    icon: Calculator,
+    color: "text-teal-600",
+    bgColor: "bg-teal-100",
+    borderColor: "border-teal-200",
+    difficulty: "Medium",
+    duration: "6-10 min",
+    points: 80,
+    players: 745,
+    rating: 4.6,
+    completed: false,
+    bestScore: 0,
+    objective: "Optimize choices to hit the exact target score",
+    skills: ["Planning", "Arithmetic", "Trade-offs"],
   },
 ]
 
-type GameProps = {
-  backToMenu: () => void
-  game: Game
-}
+const achievements = [
+  { id: "first-play", name: "First Steps", description: "Play your first mini-game", icon: Play, earned: true },
+  { id: "eco-champion", name: "Eco Champion", description: "Complete all mini-games", icon: Play, earned: false },
+]
 
 export default function GamesPage() {
   const [selectedGame, setSelectedGame] = useState<string | null>(null)
-  const [gameState, setGameState] = useState<"menu" | "playing">("menu")
+  const [gameState, setGameState] = useState<"menu" | "playing" | "completed">("menu")
+  const [session, setSession] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const t = setTimeout(() => setLoading(false), 300)
+    return () => clearTimeout(t)
+  }, [])
+
+  // Multilingual support via global context
+  const { lang } = useLanguage()
+  const translations: Record<string, Record<string, string>> = {
+    en: {
+      games_title: "Learning Mini-Games",
+      games_subtitle: "Learn sustainable farming through interactive games",
+      available_games: "Available Games",
+      achievements: "Game Achievements",
+      back_to_games: "Back to Games",
+      restart: "Restart",
+      start_game: "Start Game",
+      play_again: "Play Again",
+      score: "Score",
+      best: "Best",
+    },
+    hi: {
+      games_title: "सीखने वाले मिनी-गेम्स",
+      games_subtitle: "इंटरैक्टिव खेलों के माध्यम से टिकाऊ खेती सीखें",
+      available_games: "उपलब्ध खेल",
+      achievements: "उपलब्धियाँ",
+      back_to_games: "खेलों पर वापस",
+      restart: "दोबारा शुरू करें",
+      start_game: "खेल शुरू करें",
+      play_again: "फिर से खेलें",
+      score: "स्कोर",
+      best: "सर्वश्रेष्ठ",
+    },
+    ml: {
+      games_title: "പഠന മിനി-ഗെയിമുകൾ",
+      games_subtitle: "ഇന്ററാക്ടീവ് ഗെയിമുകൾ വഴി സുസ്ഥിര കൃഷി പഠിക്കുക",
+      available_games: "ലഭ്യമായ ഗെയിമുകൾ",
+      achievements: "നേട്ടങ്ങൾ",
+      back_to_games: "ഗെയിമുകളിലേക്ക് മടങ്ങുക",
+      restart: "വീണ്ടും തുടങ്ങുക",
+      start_game: "ഗെയിം ആരംഭിക്കുക",
+      play_again: "വീണ്ടും കളിക്കുക",
+      score: "സ്കോർ",
+      best: "മികച്ചത്",
+    },
+  }
+  const t = (key: string) => translations[lang]?.[key] ?? translations.en[key] ?? key
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
@@ -147,19 +149,44 @@ export default function GamesPage() {
   if (gameState === "playing" && selectedGame) {
     const game = miniGames.find((g) => g.id === selectedGame)
     if (!game) return null
-
-    switch (game.id) {
-      case "water-saver":
-        return <WaterSaverGame backToMenu={backToMenu} game={game} />
-      case "soil-builder":
-        return <SoilBuilderGame backToMenu={backToMenu} game={game} />
-      case "biodiversity-defender":
-        return <BiodiversityDefender backToMenu={backToMenu} game={game} />
-      case "energy-farmer":
-        return <EnergyFarmer backToMenu={backToMenu} game={game} />
-      default:
-        return null
-    }
+    return (
+      <DashboardLayout>
+        <div className="space-y-6">
+          {/* Game Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button variant="outline" onClick={backToMenu}>
+                <Home className="w-4 h-4 mr-2" />
+                {t("back_to_games")}
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">{game.title}</h1>
+                <p className="text-gray-600">{game.objective}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge className="bg-orange-100 text-orange-800">{game.difficulty}</Badge>
+              <Button
+                variant="outline"
+                className="border-orange-300 text-orange-700 hover:bg-orange-50"
+                onClick={() => setSession((s) => s + 1)}
+                aria-label="Restart game"
+                title="Restart"
+              >
+                <RefreshCcw className="w-4 h-4 mr-2" /> {t("restart")}
+              </Button>
+              <div className="text-right ml-2">
+                <div className="text-lg font-bold text-orange-600">{t("score")}: 0</div>
+                <div className="text-sm text-gray-500">{t("best")}: {game.bestScore}</div>
+              </div>
+            </div>
+          </div>
+          {/* Game Component (only new games are playable) */}
+          {selectedGame === "match-pairs" && <MatchPairsGame key={session} />}
+          {selectedGame === "sum-puzzle" && <SumPuzzleGame key={session} />}
+        </div>
+      </DashboardLayout>
+    )
   }
 
   return (
@@ -168,662 +195,448 @@ export default function GamesPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Learning Mini-Games</h1>
-            <p className="text-gray-600 mt-1">Learn sustainability through interactive games</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t("games_title")}</h1>
+            <p className="text-gray-600 mt-1">{t("games_subtitle")}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-orange-600">{miniGames.filter(game => game.completed).length}</div>
-            <div className="text-sm">Games Completed</div>
+            <div className="text-2xl font-bold text-orange-600">285</div>
+            <div className="text-sm text-gray-500">Total Points Earned</div>
           </div>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {miniGames.map((game) => {
-            const Icon = game.icon
-            return (
-              <Card key={game.id} className={`cursor-pointer border-2 ${game.borderColor} hover:shadow-lg`}>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <div className={`rounded-full p-3 ${game.bgColor}`}>
-                      <Icon className={`w-8 h-8 ${game.color}`} />
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 stagger">
+          <Card className="border-0 shadow-md">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Play className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{miniGames.filter((g) => g.completed).length}</div>
+              <div className="text-sm text-gray-600">Games Completed</div>
+            </CardContent>
+          </Card>
+          <Card className="border-0 shadow-md">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Trophy className="w-6 h-6 text-orange-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900">285</div>
+              <div className="text-sm text-gray-600">Points Earned</div>
+            </CardContent>
+          </Card>
+          <Card className="border-0 shadow-md">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <Award className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900">{achievements.filter((a) => a.earned).length}</div>
+              <div className="text-sm text-gray-600">Achievements</div>
+            </CardContent>
+          </Card>
+          <Card className="border-0 shadow-md">
+            <CardContent className="p-4 text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                <TrendingUp className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="text-2xl font-bold text-gray-900">4.6</div>
+              <div className="text-sm text-gray-600">Avg Rating</div>
+            </CardContent>
+          </Card>
+        </div>
+        {/* Mini-Games Grid */}
+        <div className="border-t border-gray-100 pt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{t("available_games")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 stagger">
+            {(loading ? Array.from({ length: 2 }).map((_, i) => ({ id: `s${i}` })) : miniGames
+              .filter((g) => g.id === "match-pairs" || g.id === "sum-puzzle")
+            ).map((game: any) => {
+              const IconComponent = game.icon
+              return (
+                <Card
+                  key={game.id}
+                  className={`border-2 shadow-md hover:shadow-lg transition-all cursor-pointer rounded-lg ${game?.borderColor ?? "border-gray-100"} ${
+                    game?.completed ? "bg-gradient-to-br from-white to-green-50" : ""
+                  }`}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      {loading ? (
+                        <div className="w-full flex items-center justify-between">
+                          <div className="skeleton w-16 h-16 rounded-full" />
+                          <div className="skeleton h-5 w-16" />
+                        </div>
+                      ) : (
+                        <>
+                          <div className={`w-16 h-16 rounded-full flex items-center justify-center ${game.bgColor}`}>
+                            <IconComponent className={`w-8 h-8 ${game.color}`} />
+                          </div>
+                          <div className="flex flex-col items-end space-y-1">
+                            <Badge className={getDifficultyColor(game.difficulty)}>{game.difficulty}</Badge>
+                            {game.completed && <Badge className="bg-green-100 text-green-800">Completed</Badge>}
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <Badge className={getDifficultyColor(game.difficulty)}>{game.difficulty}</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <h2 className="font-semibold text-lg">{game.title}</h2>
-                  <p className="text-sm mb-2">{game.description}</p>
-                  <p className="text-xs mb-2 text-gray-500">Objective: {game.objective}</p>
-                  <Button onClick={() => startGame(game.id)} size="sm" className="w-full">
-                    <Play className="inline mr-2" /> {game.completed ? "Play Again" : "Start"}
-                  </Button>
-                </CardContent>
-              </Card>
-            )
-          })}
+                    <CardTitle className="text-xl">{loading ? <span className="skeleton h-5 w-48 inline-block" /> : game.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {loading ? (
+                      <div className="space-y-2">
+                        <div className="skeleton h-3 w-5/6" />
+                        <div className="skeleton h-3 w-2/3" />
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-600">{game.description}</p>
+                    )}
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm text-gray-800">Learning Objective:</h4>
+                      {loading ? <div className="skeleton h-3 w-1/2" /> : <p className="text-xs text-gray-600">{game.objective}</p>}
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm text-gray-800">Skills Developed:</h4>
+                      {loading ? (
+                        <div className="flex flex-wrap gap-1">
+                          {[0, 1, 2].map((i) => (<div key={i} className="skeleton h-5 w-20 rounded" />))}
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap gap-1">
+                          {game.skills.map((skill: string, index: number) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <Clock className="w-4 h-4 text-gray-500" />
+                        <span>{loading ? <span className="skeleton h-3 w-16 inline-block" /> : game.duration}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Trophy className="w-4 h-4 text-orange-500" />
+                        <span>{loading ? <span className="skeleton h-3 w-16 inline-block" /> : `${game.points} points`}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Users className="w-4 h-4 text-blue-500" />
+                        <span>{loading ? <span className="skeleton h-3 w-20 inline-block" /> : `${game.players.toLocaleString()} played`}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        <span>{loading ? <span className="skeleton h-3 w-10 inline-block" /> : `${game.rating}/5`}</span>
+                      </div>
+                    </div>
+                    {game.completed && game.bestScore > 0 && (
+                      <div className="bg-green-50 p-3 rounded-lg">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-green-700 font-semibold">Best Score:</span>
+                          <span className="text-green-800 font-bold">{game.bestScore}</span>
+                        </div>
+                      </div>
+                    )}
+                    {loading ? (
+                      <div className="skeleton h-10 w-full" />
+                    ) : (
+                      <Button
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white button-press"
+                        onClick={() => startGame(game.id)}
+                      >
+                        <Play className="w-4 h-4 mr-2" />
+                        {game.completed ? t("play_again") : t("start_game")}
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        </div>
+        {/* Achievements */}
+        <div className="border-t border-gray-100 pt-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-3">{t("achievements")}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 stagger">
+            {(loading ? Array.from({ length: 4 }).map((_, i) => ({ id: `s${i}`, earned: i % 2 === 0 })) : achievements).map((achievement: any) => {
+              const IconComponent = achievement.icon
+              return (
+                <Card
+                  key={achievement.id}
+                  className={`border-0 shadow-md rounded-lg ${
+                    achievement.earned ? "bg-gradient-to-br from-white to-orange-50 border-orange-200" : "opacity-60"
+                  }`}
+                >
+                  <CardContent className="p-4 text-center">
+                    {loading ? (
+                      <>
+                        <div className="skeleton w-12 h-12 rounded-full mx-auto mb-3" />
+                        <div className="skeleton h-4 w-24 mx-auto mb-2" />
+                        <div className="skeleton h-3 w-32 mx-auto" />
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 ${
+                            achievement.earned ? "bg-orange-100" : "bg-gray-100"
+                          }`}
+                        >
+                          <IconComponent
+                            className={`w-6 h-6 ${achievement.earned ? "text-orange-600" : "text-gray-400"}`}
+                          />
+                        </div>
+                        <h3 className="font-semibold text-gray-900 text-sm">{achievement.name}</h3>
+                        <p className="text-xs text-gray-600 mt-1">{achievement.description}</p>
+                        {achievement.earned && <Badge className="bg-orange-100 text-orange-800 mt-2 text-xs">Earned</Badge>}
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
         </div>
       </div>
     </DashboardLayout>
   )
 }
 
-/* ---------------------- Water Saver (interactive, timer, random droughts) ---------------------- */
-function WaterSaverGame({ backToMenu, game }: GameProps) {
-  const [waterLevel, setWaterLevel] = useState(100)
-  const [crops, setCrops] = useState([
-    { id: 1, name: "Tomatoes", water: 0, maxWater: 30, health: 50 },
-    { id: 2, name: "Wheat", water: 0, maxWater: 25, health: 50 },
-    { id: 3, name: "Corn", water: 0, maxWater: 35, health: 50 },
-    { id: 4, name: "Rice", water: 0, maxWater: 40, health: 50 },
-  ])
-  const [score, setScore] = useState(0)
-  const [time, setTime] = useState(60)
-  const intervalRef = useRef<number | null>(null)
-
+// New Game: Match the Following (Pairs)
+function MatchPairsGame() {
+  type Card = { id: number; pairId: number; text: string; flipped: boolean; matched: boolean }
+  const [lang, setLang] = useState<"en" | "hi" | "ml">("en")
   useEffect(() => {
-    // single interval that updates game state every second
-    intervalRef.current = window.setInterval(() => {
-      setTime(prev => {
-        const next = prev - 1
-        if (next <= 0) {
-          // end game
-          window.clearInterval(intervalRef.current ?? undefined)
-        }
-        return next
-      })
-
-      // random drought with 12% chance
-      if (Math.random() < 0.12) {
-        setWaterLevel(prev => Math.max(prev - 12, 0))
-      }
-
-      // natural decay: crops slowly lose health if not sufficiently watered
-      setCrops(prev =>
-        prev.map(c => {
-          // slight decay if water low
-          const decay = c.water < c.maxWater * 0.3 ? 3 : 1
-          const newHealth = Math.max(c.health - decay, 0)
-          // drain some water naturally
-          const newWater = Math.max(c.water - 1, 0)
-          return { ...c, health: newHealth, water: newWater }
-        }),
-      )
-    }, 1000)
-
-    return () => {
-      if (intervalRef.current) window.clearInterval(intervalRef.current)
-    }
-    // intentionally empty deps: single interval lifecycle
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    try {
+      const saved = localStorage.getItem("beejsetu-language") as "en" | "hi" | "ml" | null
+      if (saved) setLang(saved)
+    } catch {}
   }, [])
 
-  useEffect(() => {
-    if (time <= 0) {
-      const avgHealth = Math.round(crops.reduce((a, c) => a + c.health, 0) / crops.length)
-      alert(`Game Over! Final Score: ${score} — Avg Health: ${avgHealth}%`)
-      backToMenu()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [time])
+  const tr = {
+    en: { title: "Match the Following", moves: "Moves", matches: "Matches Found", reset: "Reset", howto: "Flip cards to match terms with their meanings" },
+    hi: { title: "मिलान करें", moves: "चालें", matches: "मिले हुए जोड़े", reset: "रीसेट", howto: "कार्ड पलटें और शब्दों का उनके अर्थ से मिलान करें" },
+    ml: { title: "മാച്ച് ദ ഫോളോയിങ്", moves: "നടപടികൾ", matches: "കണ്ടെത്തിയ ജോഡികൾ", reset: "റീസെറ്റ്", howto: "വാക്കുകളും അതിന്റെ അർത്ഥവും പൊരുത്തപ്പെടുത്താൻ കാർഡുകൾ തിരിക്കുക" },
+  } as const
+  const t = (k: keyof typeof tr.en) => tr[lang][k]
 
-  const waterCrop = (id: number, amount: number) => {
-    if (waterLevel >= amount && time > 0) {
-      setWaterLevel(prev => prev - amount)
-      setCrops(prev =>
-        prev.map(c =>
-          c.id === id
-            ? { ...c, water: Math.min(c.water + amount, c.maxWater), health: Math.min(c.health + amount * 2, 100) }
-            : c,
-        ),
-      )
-      setScore(prev => prev + amount * 12)
+  const basePairs: Array<[string, string]> = [
+    [lang === "hi" ? "टपक सिंचाई" : lang === "ml" ? "ഡ്രിപ്പ് ഇറിഗേഷൻ" : "Drip Irrigation", lang === "hi" ? "जल की बचत करने वाली सिंचाई" : lang === "ml" ? "ജലം ലാഭിക്കുന്ന ജലസേചനം" : "Water-saving irrigation"],
+    [lang === "hi" ? "कम्पोस्ट" : lang === "ml" ? "കമ്പോസ്റ്റ്" : "Compost", lang === "hi" ? "जैविक खाद" : lang === "ml" ? "സാവകാശ വളം" : "Organic fertilizer"],
+    [lang === "hi" ? "परागण" : lang === "ml" ? "പരാഗണം" : "Pollination", lang === "hi" ? "फूलों के माध्यम से प्रजनन" : lang === "ml" ? "പുഷ്പങ്ങളുടെ വഴി പ്രജനനം" : "Reproduction via flowers"],
+  ]
+
+  const buildDeck = (): Card[] => {
+    let id = 1
+    const deck: Card[] = []
+    basePairs.forEach(([term, meaning], idx) => {
+      deck.push({ id: id++, pairId: idx, text: term, flipped: false, matched: false })
+      deck.push({ id: id++, pairId: idx, text: meaning, flipped: false, matched: false })
+    })
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[deck[i], deck[j]] = [deck[j], deck[i]]
+    }
+    return deck
+  }
+
+  const [deck, setDeck] = useState<Card[]>(buildDeck)
+  const [flippedIds, setFlippedIds] = useState<number[]>([])
+  const [moves, setMoves] = useState(0)
+
+  useEffect(() => {
+    setDeck(buildDeck())
+    setFlippedIds([])
+    setMoves(0)
+  }, [lang])
+
+  const onFlip = (id: number) => {
+    setDeck((prev) => prev.map((c) => (c.id === id && !c.matched ? { ...c, flipped: !c.flipped } : c)))
+    const next = [...flippedIds, id].filter((v, i, a) => a.indexOf(v) === i)
+    if (next.length === 2) {
+      setMoves((m) => m + 1)
+      const [a, b] = next
+      const ca = deck.find((c) => c.id === a)
+      const cb = deck.find((c) => c.id === b)
+      if (ca && cb && ca.pairId === cb.pairId) {
+        setDeck((prev) => prev.map((c) => (c.id === a || c.id === b ? { ...c, matched: true } : c)))
+        setTimeout(() => {
+          setDeck((prev) => prev.map((c) => (c.id === a || c.id === b ? { ...c, flipped: false } : c)))
+        }, 400)
+      } else {
+        setTimeout(() => {
+          setDeck((prev) => prev.map((c) => (c.id === a || c.id === b ? { ...c, flipped: false } : c)))
+        }, 600)
+      }
+      setFlippedIds([])
+    } else {
+      setFlippedIds(next)
     }
   }
 
+  const reset = () => {
+    setDeck(buildDeck())
+    setFlippedIds([])
+    setMoves(0)
+  }
+
+  const matchesFound = deck.filter((c) => c.matched).length / 2
+
   return (
-    <DashboardLayout>
-      <Button variant="outline" onClick={() => { if (intervalRef.current) window.clearInterval(intervalRef.current); backToMenu() }} className="mb-4">
-        <Home className="mr-2" /> Back to Games
-      </Button>
-      <h1 className="text-xl font-semibold">{game.title}</h1>
-      <p className="mb-4">{game.objective}</p>
-
-      <div className="grid grid-cols-4 gap-4 mb-4">
-        <div>
-          <Droplets className="mb-1 text-blue-600" />
-          <p>Water Left: {waterLevel}L</p>
-        </div>
-        <div>
-          <Trophy className="mb-1 text-yellow-600" />
-          <p>Score: {score}</p>
-        </div>
-        <div>
-          <Clock className="mb-1 text-purple-600" />
-          <p>Time Left: {time}s</p>
-        </div>
-        <div>
-          <Target className="mb-1 text-green-600" />
-          <p>Avg Health: {Math.round(crops.reduce((a, c) => a + c.health, 0) / crops.length)}%</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {crops.map(crop => (
-          <Card key={crop.id}>
-            <CardContent>
-              <h2 className="font-semibold text-center mb-2">{crop.name}</h2>
-              <p>Health: {crop.health}%</p>
-              <Progress value={crop.health} className="mb-2" />
-              <p>
-                Water: {crop.water} / {crop.maxWater}L
-              </p>
-              <div className="flex gap-2 mt-2">
-                <Button size="sm" onClick={() => waterCrop(crop.id, 5)} disabled={waterLevel < 5 || time <= 0}>
-                  +5L
-                </Button>
-                <Button size="sm" onClick={() => waterCrop(crop.id, 10)} disabled={waterLevel < 10 || time <= 0}>
-                  +10L
-                </Button>
-              </div>
+    <div className="space-y-6">
+      <Card className="border-0 shadow-md">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold">{t("title")}</h2>
+            <p className="text-gray-600 text-sm">{t("howto")}</p>
+          </div>
+          <div className="flex items-center gap-4 text-sm">
+            <span className="text-gray-700">
+              {t("moves")}: <span className="font-semibold">{moves}</span>
+            </span>
+            <span className="text-gray-700">
+              {t("matches")}: <span className="font-semibold">{matchesFound}/3</span>
+            </span>
+            <Button variant="outline" className="border-orange-300 text-orange-700 hover:bg-orange-50" onClick={reset}>
+              {t("reset")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        {deck.map((card) => (
+          <Card
+            key={card.id}
+            className={`cursor-pointer border-0 shadow-md transition-transform ${
+              card.matched ? "ring-2 ring-green-400" : "hover:translate-y-[-2px]"
+            }`}
+            onClick={() => (!card.flipped && !card.matched ? onFlip(card.id) : null)}
+          >
+            <CardContent className="p-6 h-28 flex items-center justify-center">
+              <span className={`text-center ${card.flipped || card.matched ? "text-gray-900" : "text-gray-300"}`}>
+                {card.flipped || card.matched ? card.text : "?"}
+              </span>
             </CardContent>
           </Card>
         ))}
       </div>
-    </DashboardLayout>
+    </div>
   )
 }
 
-/* ---------------------- Soil Builder (compost, rotation, events) ---------------------- */
-function SoilBuilderGame({ backToMenu, game }: GameProps) {
-  const [soilHealth, setSoilHealth] = useState(40)
-  const [nutrients, setNutrients] = useState({ nitrogen: 30, phosphorus: 25, potassium: 35 })
-  const [compost, setCompost] = useState(50)
-  const [score, setScore] = useState(0)
-  const [time, setTime] = useState(90)
-  const [lastRotation, setLastRotation] = useState<string | null>(null) // track last planted crop type
-  const intervalRef = useRef<number | null>(null)
+// New Game: Sustainability Sum Puzzle
+function SumPuzzleGame() {
+  const { lang } = useLanguage()
 
-  useEffect(() => {
-    intervalRef.current = window.setInterval(() => {
-      setTime(prev => {
-        const next = prev - 1
-        if (next <= 0) {
-          window.clearInterval(intervalRef.current ?? undefined)
-        }
-        return next
-      })
+  const tr = {
+    en: {
+      title: "Sustainability Sum Puzzle",
+      target: "Target",
+      current: "Current Sum",
+      submit: "Submit",
+      reset: "Reset",
+      success: "Great! Exact target reached.",
+      tryagain: "Not exact. Try again!",
+    },
+    hi: {
+      title: "सस्टेनेबिलिटी सम पहेली",
+      target: "लक्ष्य",
+      current: "वर्तमान योग",
+      submit: "जमा करें",
+      reset: "रीसेट",
+      success: "शानदार! लक्ष्य पूरा हुआ।",
+      tryagain: "सटीक नहीं। फिर से कोशिश करें!",
+    },
+    ml: {
+      title: "സുസ്ഥിരത സം പസിൽ",
+      target: "ലക്ഷ്യം",
+      current: "നിലവിലെ മൊത്തം",
+      submit: "സമർപ്പിക്കുക",
+      reset: "റീസെറ്റ്",
+      success: "ശ്രദ്ധേയമാണ്! ലക്ഷ്യം നേടി.",
+      tryagain: "സരിയായി ഇല്ല. വീണ്ടും ശ്രമിക്കൂ!",
+    },
+  } as const
 
-      // small nutrient depletion over time
-      setNutrients(prev => ({
-        nitrogen: Math.max(prev.nitrogen - 1, 0),
-        phosphorus: Math.max(prev.phosphorus - 0.5, 0),
-        potassium: Math.max(prev.potassium - 0.7, 0),
-      }))
+  const t = (k: keyof typeof tr.en) => tr[lang][k]
 
-      // soil health drifts with nutrient average
-      setSoilHealth(prev => {
-        const avg = (nutrients.nitrogen + nutrients.phosphorus + nutrients.potassium) / 3
-        // gentle drift toward nutrients average (makes gameplay dynamic)
-        const drift = Math.round((avg - prev) * 0.03)
-        return Math.max(Math.min(prev + drift, 100), 0)
-      })
+  const actions = [
+    { id: 1, en: "Drip Irrigation", hi: "टपक सिंचाई", ml: "ഡ്രിപ്പ് ഇറിഗേഷൻ", value: 5 },
+    { id: 2, en: "Composting", hi: "कम्पोस्टिंग", ml: "കമ്പോസ്റ്റിംഗ്", value: 3 },
+    { id: 3, en: "Mulching", hi: "मल्चिंग", ml: "മൾച്ചിംഗ്", value: 2 },
+    { id: 4, en: "Solar Pump", hi: "सौर पंप", ml: "സോളാർ പമ്പ്", value: 7 },
+    { id: 5, en: "Rainwater Harvesting", hi: "वर्षा जल संचयन", ml: "മഴവെള്ള ശേഖരണം", value: 8 },
+  ]
 
-      // random rainfall event that slightly boosts phosphorus
-      if (Math.random() < 0.08) {
-        setNutrients(prev => ({ ...prev, phosphorus: Math.min(prev.phosphorus + 8, 100) }))
-        setScore(prev => prev + 30)
-      }
-    }, 1000)
+  const [target, setTarget] = useState<number>(() => 10 + Math.floor(Math.random() * 10))
+  const [selected, setSelected] = useState<number[]>([])
+  const [message, setMessage] = useState<string | null>(null)
 
-    return () => {
-      if (intervalRef.current) window.clearInterval(intervalRef.current)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    if (time <= 0) {
-      const avgN = Math.round((nutrients.nitrogen + nutrients.phosphorus + nutrients.potassium) / 3)
-      alert(`Game Over! Score: ${score} — Soil Health: ${soilHealth}% — Avg Nutrients: ${avgN}%`)
-      backToMenu()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [time])
-
-  const addCompost = () => {
-    if (compost >= 10 && time > 0) {
-      setCompost(prev => prev - 10)
-      setSoilHealth(prev => Math.min(prev + 15, 100))
-      setNutrients(prev => ({
-        nitrogen: Math.min(prev.nitrogen + 5, 100),
-        phosphorus: Math.min(prev.phosphorus + 3, 100),
-        potassium: Math.min(prev.potassium + 4, 100),
-      }))
-      setScore(prev => prev + 150)
-    }
+  const toggle = (id: number) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+    setMessage(null)
   }
 
-  const plantRotation = (type: "legume" | "cereal" | "cover") => {
-    if (time <= 0) return
-    // planting affected by lastRotation: encourage diversity
-    if (lastRotation === type) {
-      // penalty for repeating same crop quickly
-      setSoilHealth(prev => Math.max(prev - 6, 0))
-      setScore(prev => Math.max(prev - 30, 0))
+  const currentSum = selected.reduce((sum, id) => sum + (actions.find((a) => a.id === id)?.value ?? 0), 0)
+
+  const submit = () => {
+    if (currentSum === target) {
+      setMessage("success")
     } else {
-      // benefits for rotation
-      if (type === "legume") {
-        setNutrients(prev => ({ ...prev, nitrogen: Math.min(prev.nitrogen + 12, 100) }))
-        setSoilHealth(prev => Math.min(prev + 8, 100))
-        setScore(prev => prev + 120)
-      } else if (type === "cereal") {
-        setNutrients(prev => ({ ...prev, potassium: Math.min(prev.potassium + 8, 100) }))
-        setSoilHealth(prev => Math.min(prev + 5, 100))
-        setScore(prev => prev + 80)
-      } else {
-        // cover crop
-        setNutrients(prev => ({ ...prev, phosphorus: Math.min(prev.phosphorus + 6, 100) }))
-        setSoilHealth(prev => Math.min(prev + 10, 100))
-        setScore(prev => prev + 100)
-      }
+      setMessage("try")
     }
-    setLastRotation(type)
+  }
+
+  const reset = () => {
+    setSelected([])
+    setMessage(null)
+    setTarget(10 + Math.floor(Math.random() * 10))
   }
 
   return (
-    <DashboardLayout>
-      <Button variant="outline" onClick={() => { if (intervalRef.current) window.clearInterval(intervalRef.current); backToMenu() }} className="mb-4">
-        <Home className="mr-2" /> Back to Games
-      </Button>
-
-      <h1 className="text-xl font-semibold">{game.title}</h1>
-      <p className="mb-4">{game.objective}</p>
-
-      <div className="grid grid-cols-4 gap-4 mb-4">
-        <Card>
-          <CardContent className="text-center">
-            <Leaf className="text-green-600 mb-2" />
-            <div>Soil Health: {soilHealth}%</div>
-            <Progress value={soilHealth} className="mt-2" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="text-center">
-            <Trophy className="text-yellow-600 mb-2" />
-            <div>Score: {score}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="text-center">
-            <div className="mb-2 rounded-full bg-brown-100 text-brown-600 p-2">C</div>
-            <div>Compost: {compost}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="text-center">
-            <Target className="text-purple-600 mb-2" />
-            <div>Time: {time}s</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold mb-2">Nitrogen</h3>
-            <Progress value={nutrients.nitrogen} />
-            <div className="text-sm mt-2">{Math.round(nutrients.nitrogen)}%</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold mb-2">Phosphorus</h3>
-            <Progress value={nutrients.phosphorus} />
-            <div className="text-sm mt-2">{Math.round(nutrients.phosphorus)}%</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold mb-2">Potassium</h3>
-            <Progress value={nutrients.potassium} />
-            <div className="text-sm mt-2">{Math.round(nutrients.potassium)}%</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex gap-3 mb-4">
-        <Button onClick={addCompost} disabled={compost < 10}>Add Compost (-10)</Button>
-        <Button onClick={() => plantRotation("legume")}>Plant Legume</Button>
-        <Button onClick={() => plantRotation("cereal")}>Plant Cereal</Button>
-        <Button onClick={() => plantRotation("cover")}>Plant Cover Crop</Button>
-      </div>
-
-      <div className="text-sm text-gray-600">
-        Tip: Rotate crops (legume → cereal → cover) to keep nutrients balanced. Random rainfall events may help phosphorus.
-      </div>
-    </DashboardLayout>
-  )
-}
-
-/* ---------------------- Biodiversity Defender (waves, deploy units, cooldowns) ---------------------- */
-function BiodiversityDefender({ backToMenu, game }: GameProps) {
-  const [ecosystem, setEcosystem] = useState({
-    pollinators: 20,
-    beneficialInsects: 15,
-    birds: 10,
-    soilMicrobes: 25,
-  })
-  const [threats, setThreats] = useState({
-    pests: 30,
-    diseases: 20,
-    chemicals: 15,
-  })
-  const [score, setScore] = useState(0)
-  const [time, setTime] = useState(80)
-  const [cooldowns, setCooldowns] = useState({ releaseBees: 0, releaseLadybugs: 0 })
-  const intervalRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    intervalRef.current = window.setInterval(() => {
-      setTime(prev => {
-        const next = prev - 1
-        if (next <= 0) {
-          window.clearInterval(intervalRef.current ?? undefined)
-        }
-        return next
-      })
-
-      // threats slowly increase (waves)
-      setThreats(prev => ({
-        pests: Math.min(prev.pests + 1, 100),
-        diseases: Math.min(prev.diseases + (Math.random() < 0.2 ? 2 : 1), 100),
-        chemicals: Math.min(prev.chemicals + (Math.random() < 0.08 ? 3 : 0.5), 100),
-      }))
-
-      // cooldowns tick down
-      setCooldowns(prev => ({
-        releaseBees: Math.max(prev.releaseBees - 1, 0),
-        releaseLadybugs: Math.max(prev.releaseLadybugs - 1, 0),
-      }))
-    }, 1000)
-
-    return () => {
-      if (intervalRef.current) window.clearInterval(intervalRef.current)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    if (time <= 0) {
-      // evaluate balance
-      const beneficialAvg = Math.round((ecosystem.pollinators + ecosystem.beneficialInsects + ecosystem.birds + ecosystem.soilMicrobes) / 4)
-      const threatsAvg = Math.round((threats.pests + threats.diseases + threats.chemicals) / 3)
-      let finalMsg = `Final Score: ${score} — Beneficial Avg: ${beneficialAvg}% — Threats Avg: ${threatsAvg}%`
-      if (beneficialAvg >= 60 && threatsAvg <= 40) finalMsg = "You Win! " + finalMsg
-      else finalMsg = "You Lose. " + finalMsg
-      alert(finalMsg)
-      backToMenu()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [time])
-
-  const deployDefense = (type: keyof typeof ecosystem) => {
-    if (time <= 0) return
-    setEcosystem(prev => ({ ...prev, [type]: Math.min(prev[type] + 8, 100) }))
-    // reduce threats a bit
-    setThreats(prev => ({
-      pests: Math.max(prev.pests - 6, 0),
-      diseases: Math.max(prev.diseases - 3, 0),
-      chemicals: Math.max(prev.chemicals - 2, 0),
-    }))
-    setScore(prev => prev + 80)
-  }
-
-  const specialRelease = (which: "bees" | "ladybugs") => {
-    if (time <= 0) return
-    if (which === "bees" && cooldowns.releaseBees === 0) {
-      setEcosystem(prev => ({ ...prev, pollinators: Math.min(prev.pollinators + 25, 100) }))
-      setThreats(prev => ({ ...prev, pests: Math.max(prev.pests - 15, 0) }))
-      setScore(prev => prev + 300)
-      setCooldowns(prev => ({ ...prev, releaseBees: 25 }))
-    } else if (which === "ladybugs" && cooldowns.releaseLadybugs === 0) {
-      setEcosystem(prev => ({ ...prev, beneficialInsects: Math.min(prev.beneficialInsects + 25, 100) }))
-      setThreats(prev => ({ ...prev, pests: Math.max(prev.pests - 20, 0) }))
-      setScore(prev => prev + 350)
-      setCooldowns(prev => ({ ...prev, releaseLadybugs: 30 }))
-    }
-  }
-
-  return (
-    <DashboardLayout>
-      <Button variant="outline" onClick={() => { if (intervalRef.current) window.clearInterval(intervalRef.current); backToMenu() }} className="mb-4">
-        <Home className="mr-2" /> Back to Games
-      </Button>
-
-      <h1 className="text-xl font-semibold">{game.title}</h1>
-      <p className="mb-4">{game.objective}</p>
-
-      <div className="grid grid-cols-4 gap-4 mb-4">
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold">Pollinators</h3>
-            <Progress value={ecosystem.pollinators} className="mb-2" />
-            <div>{ecosystem.pollinators}%</div>
-            <Button size="sm" onClick={() => deployDefense("pollinators")}>Deploy Pollinators</Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold">Beneficial Insects</h3>
-            <Progress value={ecosystem.beneficialInsects} className="mb-2" />
-            <div>{ecosystem.beneficialInsects}%</div>
-            <Button size="sm" onClick={() => deployDefense("beneficialInsects")}>Release Insects</Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold">Threats (Pests)</h3>
-            <Progress value={threats.pests} className="mb-2" />
-            <div>{threats.pests}%</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold">Time & Score</h3>
-            <div>Time: {time}s</div>
-            <div>Score: {score}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex gap-3 mb-4">
-        <Button onClick={() => specialRelease("bees")} disabled={cooldowns.releaseBees > 0}>
-          Release Bees {cooldowns.releaseBees > 0 ? `(${cooldowns.releaseBees}s)` : ""}
-        </Button>
-        <Button onClick={() => specialRelease("ladybugs")} disabled={cooldowns.releaseLadybugs > 0}>
-          Release Ladybugs {cooldowns.releaseLadybugs > 0 ? `(${cooldowns.releaseLadybugs}s)` : ""}
-        </Button>
-        <Button onClick={() => deployDefense("birds")}>Attract Birds</Button>
-        <Button onClick={() => deployDefense("soilMicrobes")}>Add Microbes</Button>
-      </div>
-
-      <div className="text-sm text-gray-600">
-        Watch out for pest waves — use special releases on cooldown to regain control quickly.
-      </div>
-    </DashboardLayout>
-  )
-}
-
-/* ---------------------- Energy Farmer (renewables, blackouts, upgrades) ---------------------- */
-function EnergyFarmer({ backToMenu, game }: GameProps) {
-  const [energy, setEnergy] = useState({
-    solar: 30,
-    wind: 10,
-    grid: 60,
-  })
-  const [consumption, setConsumption] = useState({
-    irrigation: 40,
-    processing: 30,
-    lighting: 20,
-    cooling: 25,
-  })
-  const [efficiency, setEfficiency] = useState(65)
-  const [cost, setCost] = useState(1200)
-  const [score, setScore] = useState(0)
-  const [time, setTime] = useState(100)
-  const [blackout, setBlackout] = useState(false)
-  const intervalRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    intervalRef.current = window.setInterval(() => {
-      setTime(prev => {
-        const next = prev - 1
-        if (next <= 0) {
-          window.clearInterval(intervalRef.current ?? undefined)
-        }
-        return next
-      })
-
-      // Random blackout event
-      if (!blackout && Math.random() < 0.06) {
-        setBlackout(true)
-        setTimeout(() => setBlackout(false), 6000 + Math.floor(Math.random() * 5000)) // blackout lasts 6-11s
-      }
-
-      // natural renewable charge drift
-      setEnergy(prev => ({
-        solar: Math.min(prev.solar + (Math.random() < 0.4 ? 2 : 0), 100),
-        wind: Math.min(prev.wind + (Math.random() < 0.25 ? 3 : 0), 100),
-        grid: Math.max(prev.grid - 1, 0),
-      }))
-
-      // consumption fluctuates
-      setConsumption(prev => ({
-        irrigation: Math.min(Math.max(prev.irrigation + (Math.random() < 0.3 ? 1 : -1), 10), 80),
-        processing: Math.min(Math.max(prev.processing + (Math.random() < 0.25 ? 1 : -1), 5), 60),
-        lighting: Math.min(Math.max(prev.lighting + (Math.random() < 0.2 ? 1 : -1), 5), 50),
-        cooling: Math.min(Math.max(prev.cooling + (Math.random() < 0.3 ? 1 : -1), 5), 60),
-      }))
-
-      // efficiency slightly improves if renewables are high
-      setEfficiency(prev => {
-        const renewablesAvg = (energy.solar + energy.wind) / 2
-        const delta = renewablesAvg > 60 ? 1 : renewablesAvg > 40 ? 0.5 : -0.3
-        return Math.max(Math.min(Math.round((prev + delta) * 10) / 10, 100), 0)
-      })
-
-      // cost slowly updates based on grid usage
-      setCost(prev => {
-        const gridUsage = 100 - (energy.solar + energy.wind + energy.grid) / 2
-        const newCost = Math.max(Math.round(prev + (gridUsage > 50 ? 10 : -5)), 0)
-        return newCost
-      })
-    }, 1000)
-
-    return () => {
-      if (intervalRef.current) window.clearInterval(intervalRef.current)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blackout])
-
-  useEffect(() => {
-    if (time <= 0) {
-      const renewables = Math.round((energy.solar + energy.wind) / 2)
-      let result = `Final Score: ${score} — Renewables Avg: ${renewables}% — Monthly Cost: ₹${cost}`
-      if (renewables >= 60 && cost <= 1000) result = "You Win! " + result
-      else result = "Try Again. " + result
-      alert(result)
-      backToMenu()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [time])
-
-  const upgradeRenewable = (type: keyof typeof energy) => {
-    if (time <= 0) return
-    // pay some 'cost' (reduce score or money); here we use score as a proxy currency
-    setEnergy(prev => {
-      if (prev[type] >= 100) return prev
-      const change = { ...prev, [type]: Math.min(prev[type] + 12, 100), grid: Math.max(prev.grid - 6, 0) }
-      return change
-    })
-    setEfficiency(prev => Math.min(prev + 6, 100))
-    setCost(prev => Math.max(prev - 120, 0))
-    setScore(prev => prev + 200)
-  }
-
-  const emergencyReduceConsumption = () => {
-    if (time <= 0) return
-    setConsumption(prev => ({
-      irrigation: Math.max(prev.irrigation - 12, 5),
-      processing: Math.max(prev.processing - 10, 5),
-      lighting: Math.max(prev.lighting - 8, 5),
-      cooling: Math.max(prev.cooling - 10, 5),
-    }))
-    setScore(prev => prev + 120)
-  }
-
-  return (
-    <DashboardLayout>
-      <Button variant="outline" onClick={() => { if (intervalRef.current) window.clearInterval(intervalRef.current); backToMenu() }} className="mb-4">
-        <Home className="mr-2" /> Back to Games
-      </Button>
-
-      <h1 className="text-xl font-semibold">{game.title}</h1>
-      <p className="mb-4">{game.objective}</p>
-
-      <div className="grid grid-cols-4 gap-4 mb-4">
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold">Solar</h3>
-            <Progress value={energy.solar} />
-            <div>{energy.solar}%</div>
-            <Button size="sm" onClick={() => upgradeRenewable("solar")}>Upgrade Solar</Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold">Wind</h3>
-            <Progress value={energy.wind} />
-            <div>{energy.wind}%</div>
-            <Button size="sm" onClick={() => upgradeRenewable("wind")}>Upgrade Wind</Button>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold">Grid</h3>
-            <Progress value={energy.grid} />
-            <div>{energy.grid}%</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold">Status</h3>
-            <div>Time: {time}s</div>
-            <div>Cost: ₹{cost}</div>
-            <div>Score: {score}</div>
-            <div>{blackout ? "Blackout Active!" : "Grid Stable"}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="mb-4">
-        <h4 className="font-semibold mb-2">Consumption</h4>
-        {Object.entries(consumption).map(([system, percent]) => (
-          <div key={system} className="flex justify-between mb-1">
-            <span className="capitalize">{system}</span>
-            <span>{percent}%</span>
+    <div className="space-y-6">
+      <Card className="border-0 shadow-md">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold">{t("title")}</h2>
+            <p className="text-gray-600 text-sm">
+              {t("target")}: <span className="font-semibold">{target}</span>
+            </p>
           </div>
+          <div className="flex items-center gap-4 text-sm">
+            <span className="text-gray-700">
+              {t("current")}: <span className="font-semibold">{currentSum}</span>
+            </span>
+            <Button variant="outline" className="border-orange-300 text-orange-700 hover:bg-orange-50" onClick={reset}>
+              {t("reset")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {actions.map((a) => (
+          <Card
+            key={a.id}
+            className={`cursor-pointer border-0 shadow-md ${selected.includes(a.id) ? "ring-2 ring-orange-400" : ""}`}
+            onClick={() => toggle(a.id)}
+          >
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="font-semibold text-gray-900">{a[lang]}</div>
+                <div className="text-xs text-gray-500">+{a.value}</div>
+              </div>
+              <Badge className={selected.includes(a.id) ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-700"}>
+                {selected.includes(a.id) ? "✓" : "+"}
+              </Badge>
+            </CardContent>
+          </Card>
         ))}
       </div>
-
-      <div className="flex gap-3">
-        <Button onClick={emergencyReduceConsumption}>Emergency Reduce Consumption</Button>
-        <Button onClick={() => upgradeRenewable("wind")}>Upgrade Wind</Button>
+      <div className="flex items-center gap-3">
+        <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={submit}>
+          {t("submit")}
+        </Button>
+        {message === "success" && (
+          <Badge className="bg-green-100 text-green-800">{t("success")}</Badge>
+        )}
+        {message === "try" && <Badge className="bg-red-100 text-red-800">{t("tryagain")}</Badge>}
       </div>
-
-      <div className="mt-4 text-sm text-gray-600">
-        Random blackouts may force you to rely on renewables — upgrade them to reduce monthly cost and increase efficiency.
-      </div>
-    </DashboardLayout>
+    </div>
   )
 }
+

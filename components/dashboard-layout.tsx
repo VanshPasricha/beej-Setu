@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -23,6 +23,7 @@ import { useTranslation } from "@/hooks/use-translation"
 import Link from "next/link"
 import { Chatbot } from "@/components/chatbot"
 import { TranslationWrapper } from "@/components/translation-wrapper"
+import { LanguageSwitcher } from "@/components/language-switcher"
 
 const navigationItems = [
   { id: "dashboard", label: "Dashboard", icon: Home, href: "/dashboard", active: true },
@@ -41,6 +42,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { t } = useTranslation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [chatbotOpen, setChatbotOpen] = useState(false)
+
+  // Smooth reveal on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => el.classList.add("visible"))
+    }, 50)
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-orange-100">
@@ -75,14 +84,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className="flex-1 px-4 py-4 space-y-1.5">
             <TranslationWrapper>
               {navigationItems.map((item) => {
                 const IconComponent = item.icon
                 return (
                   <Link key={item.id} href={item.href}>
                     <div
-                      className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all duration-200 hover:scale-105 ${
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 hover:scale-[1.02] ${
                         item.active
                           ? "bg-orange-100 text-orange-700 border border-orange-200"
                           : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -103,6 +112,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               })}
             </TranslationWrapper>
           </nav>
+
+          {/* Language Switcher (Sidebar) */}
+          <div className="px-6 pb-4">
+            <LanguageSwitcher />
+          </div>
 
           {/* Chatbot Button */}
           <div className="p-4 border-t border-gray-200">
@@ -142,6 +156,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main content */}
       <div className="lg:ml-64">
+        {/* Desktop topbar */}
+        <div className="hidden lg:block bg-white/70 backdrop-blur border-b border-gray-200 sticky top-0 z-30">
+          <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+            <TranslationWrapper>
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-green-600 rounded-full flex items-center justify-center">
+                  <Sprout className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-bold text-gray-900">{t("appName")}</span>
+                <span className="text-gray-400">•</span>
+                <span className="text-sm text-gray-600">{t("tagline")}</span>
+              </div>
+            </TranslationWrapper>
+            <LanguageSwitcher inline />
+          </div>
+        </div>
         {/* Mobile header */}
         <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3">
           <div className="flex items-center justify-between">
@@ -156,12 +186,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <span className="font-bold text-gray-900">{t("appName")}</span>
               </div>
             </TranslationWrapper>
-            <div className="w-10" /> {/* Spacer for centering */}
+            <div className="flex items-center">
+              <LanguageSwitcher inline />
+            </div>
           </div>
         </div>
 
         {/* Page content */}
-        <main className="p-6">{children}</main>
+        <main className="p-6 max-w-7xl mx-auto reveal animate-fade-in-up">{children}</main>
       </div>
 
       <Chatbot />
