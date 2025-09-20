@@ -77,13 +77,38 @@ export default function ProfileSetupPage() {
   }
 
   const handleSubmit = async () => {
-    setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      setIsLoading(true)
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          farmerName: profile.farmerName,
+          farmSize: profile.farmSize,
+          location: profile.location,
+          phoneNumber: profile.phoneNumber,
+          bio: profile.bio,
+          cropsGrown: profile.cropsGrown,
+          soilType: profile.soilType,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || res.statusText)
+      }
+      const data = await res.json()
+      // Persist user id and name for later use
+      try {
+        localStorage.setItem('beejsetu-userId', String(data.userId))
+        localStorage.setItem('beejsetu-userName', profile.farmerName)
+      } catch {}
+      window.location.href = '/dashboard'
+    } catch (e) {
+      console.error('Profile submit failed', e)
+      alert('Failed to save profile. Please try again.')
+    } finally {
       setIsLoading(false)
-      // Redirect to dashboard
-      window.location.href = "/dashboard"
-    }, 2000)
+    }
   }
 
   const isStepValid = () => {

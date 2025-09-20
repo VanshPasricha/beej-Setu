@@ -46,7 +46,7 @@ export default function HomePage() {
 
   if (showLanguageSelection) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-orange-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-orange-100 flex items-center justify-center p-0">
         <Card
           className={`w-full max-w-md shadow-xl border-0 transition-all duration-500 ease-out transform ${
             isAnimating ? "scale-95 opacity-0" : "scale-100 opacity-100"
@@ -96,7 +96,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-orange-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-orange-100 flex items-center justify-center p-0">
       <Card
         className={`w-full max-w-md shadow-xl border-0 transition-all duration-500 ease-out transform ${
           isAnimating ? "scale-95 opacity-0" : "scale-100 opacity-100"
